@@ -1,0 +1,33 @@
+name: sunmachine
+description: Sunmachine
+publish_to: 'none'
+version: 0.5.0
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.0
+  device_info: ^1.0.0
+  flutter_ble_lib: ^2.3.2
+  flutter_native_timezone: ^1.0.4
+  location: ^3.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.8.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - intro.png
+    - intro-opa.png
+    - tzdata.json
+
+flutter_icons:
+  android: false
+  ios: true
+  image_path: 'assets/appicon.png'
