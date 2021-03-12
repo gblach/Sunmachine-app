@@ -186,7 +186,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
         'dow': dow,
         'hh': _time.hour,
         'mm': _time.minute,
-        'routine': _routine,
+        'routine': _routine < 4 ? _routine : 2,
         'chan': _routine > 0 ? _chan : 0,
         'value': _value,
       });
@@ -404,7 +404,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        )
+        ),
       ]),
       top: 6,
     );

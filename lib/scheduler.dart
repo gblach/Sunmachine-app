@@ -42,8 +42,20 @@ class _SchedulerState extends State<Scheduler> {
             break;
 
           case 2:
-            job['_title_1'] = '${ROUTINE[job['routine']]} #${job['chan']+1}';
-            job['_title_2'] = '${job['value']} \u00B0';
+            switch(board_pixtype(job['chan'])) {
+              case 0:
+                job['_title_1'] = '${ROUTINE[job['routine']]} #${job['chan']+1}';
+                job['_title_2'] = '${job['value']} \u00B0';
+                break;
+
+              case 1:
+                job['_title_1'] = '${ROUTINE[4]} #${job['chan']+1}';
+                job['_title_2'] = '${hue_to_temp(job['value'])} K';
+                break;
+
+              default:
+                job['_title_1'] = job['_title_2'] = '';
+            }
             break;
 
           default:
