@@ -139,34 +139,27 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     ble_device = _results[index].result;
     _stop_scan();
 
-    try {
-      setState(() => _connection = Connection.connecting);
-      await ble_device.peripheral.connect(requestMtu: 160, timeout: Duration(seconds: 15));
-      _conn_sub = ble_device.peripheral.observeConnectionState(completeOnDisconnect: true)
-        .listen((PeripheralConnectionState state) {
-          if(state == PeripheralConnectionState.disconnected) {
-            Navigator.popUntil(context, ModalRoute.withName('/'));
-          }
-        });
-
-      setState(() => _connection = Connection.discovering);
-      await ble_device.peripheral.discoverAllServicesAndCharacteristics();
-
-      Navigator.pushNamed(context, '/device').whenComplete(() async {
-        _conn_sub?.cancel();
-        if(await ble_device.peripheral.isConnected()) {
-          await ble_device.peripheral.disconnectOrCancelConnection();
-          ble_device = null;
+    setState(() => _connection = Connection.connecting);
+    await ble_device.peripheral.connect(requestMtu: 160, timeout: Duration(seconds: 15));
+    _conn_sub = ble_device.peripheral.observeConnectionState(completeOnDisconnect: true)
+      .listen((PeripheralConnectionState state) {
+        if(state == PeripheralConnectionState.disconnected) {
+          Navigator.popUntil(context, ModalRoute.withName('/'));
         }
-        setState(() => _connection = null);
-        _start_scan();
       });
-    } on BleError {
+
+    setState(() => _connection = Connection.discovering);
+    await ble_device.peripheral.discoverAllServicesAndCharacteristics();
+
+    Navigator.pushNamed(context, '/device').whenComplete(() async {
       _conn_sub?.cancel();
+      if(await ble_device.peripheral.isConnected()) {
+        await ble_device.peripheral.disconnectOrCancelConnection();
+      }
       ble_device = null;
       setState(() => _connection = null);
       _start_scan();
-    }
+    });
   }
 
   @override
@@ -204,7 +197,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
         ),
         Text(
           'No light sources found',
-          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18)
+          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
         ),
         Text(
           'Wait while looking for light sources.\nThis should take a few seconds.',
