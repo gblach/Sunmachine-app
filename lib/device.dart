@@ -33,12 +33,12 @@ class _DeviceState extends State<Device> {
 
     final unix_time = ByteData(8);
     unix_time.setInt64(0, DateTime.now().millisecondsSinceEpoch ~/ 1000, Endian.little);
-    ble_write(context, 0x05, unix_time.buffer.asUint8List());
+    ble_write(context, 0x06, unix_time.buffer.asUint8List());
 
     final String timezone = await FlutterNativeTimezone.getLocalTimezone();
     final Map tzdata = jsonDecode(await rootBundle.loadString('assets/tzdata.json'));
     if(tzdata.containsKey(timezone)) {
-      ble_write(context, 0x06, Uint8List.fromList(tzdata[timezone].codeUnits));
+      ble_write(context, 0x07, Uint8List.fromList(tzdata[timezone].codeUnits));
     }
 
     super.didChangeDependencies();
@@ -47,8 +47,8 @@ class _DeviceState extends State<Device> {
   void _refresh() async {
     setState(() => _mutex = true);
 
-    await ble_read(context, 0x01);
     await ble_read(context, 0x02);
+    await ble_read(context, 0x03);
 
     setState(() {
       _mutex = false;
@@ -96,13 +96,13 @@ class _DeviceState extends State<Device> {
       }
     });
     board_mode(_mode.index);
-    ble_write(context, 0x01);
+    ble_write(context, 0x02);
   }
 
   Future<void> _on_mode_radio(Mode value) async {
     setState(() => _mode = _mode_radio = value);
     board_mode(_mode.index);
-    ble_write(context, 0x01);
+    ble_write(context, 0x02);
   }
 
   void _on_channel(int chan) {
@@ -115,7 +115,7 @@ class _DeviceState extends State<Device> {
 
   void _on_brightness_end(int chan, int value) {
     board_brightness(chan, value);
-    ble_write(context, chan < 2 ? 0x01 : 0x02);
+    ble_write(context, chan < 2 ? 0x02 : 0x03);
   }
 
   void _on_hue(int chan, int value) {
@@ -124,7 +124,7 @@ class _DeviceState extends State<Device> {
 
   void _on_hue_end(int chan, int value) {
     board_hue(chan, value);
-    ble_write(context, 0x02);
+    ble_write(context, 0x03);
   }
 
   void _on_saturation(int chan, int value) {
@@ -133,7 +133,7 @@ class _DeviceState extends State<Device> {
 
   void _on_saturation_end(int chan, int value) {
     board_saturation(chan, value);
-    ble_write(context, 0x02);
+    ble_write(context, 0x03);
   }
 
   void _goto_settings() {

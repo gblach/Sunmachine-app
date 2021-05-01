@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
       ];
     });
 
-    _light_sub = ble_monitor(0x03, (Uint8List value) {
+    _light_sub = ble_monitor(0x04, (Uint8List value) {
       setState(() => _light_cur = (value[0] | value[1] << 8));
     });
   }
@@ -71,7 +71,7 @@ class _SettingsState extends State<Settings> {
 
   void _on_timeout_end(int value) {
     board_timeout(value);
-    ble_write(context, 0x01);
+    ble_write(context, 0x02);
   }
 
   void _on_ambient_light(int value) {
@@ -80,7 +80,7 @@ class _SettingsState extends State<Settings> {
 
   void _on_ambient_light_end(int value) {
     board_light(value);
-    ble_write(context, 0x01);
+    ble_write(context, 0x02);
   }
 
   void _on_speed(int value) {
@@ -89,24 +89,24 @@ class _SettingsState extends State<Settings> {
 
   void _on_speed_end(int value) {
     board_speed(value.toInt());
-    ble_write(context, 0x01);
+    ble_write(context, 0x02);
   }
 
   void _on_channel(int chan, bool value) {
     setState(() => _channel[chan] = value);
     board_channel(chan, value);
-    ble_write(context, 0x01);
+    ble_write(context, 0x02);
   }
 
   void _on_pixlen(int chan, String value) {
     board_pixlen(chan, int.parse(value));
-    ble_write(context, 0x02);
+    ble_write(context, 0x03);
   }
 
   void _on_pixtype(int chan, String value) {
     setState(() => _pixtype[chan-2] = board_pixtype(chan, PIXTYPE.indexOf(value)));
     if(_pixtype[chan-2] == 1 && board_hue(chan) < 120) board_hue(chan, 120);
-    ble_write(context, 0x02);
+    ble_write(context, 0x03);
   }
 
   void _goto_scheduler() {

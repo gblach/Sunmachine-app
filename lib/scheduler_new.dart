@@ -191,7 +191,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
         'value': _value,
       });
       board_crontab_to_cronbuf();
-      ble_write(context, 0x04);
+      ble_write(context, 0x05);
     }
 
     Navigator.pop(context);

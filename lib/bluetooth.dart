@@ -26,9 +26,9 @@ Future<Uint8List> ble_read(BuildContext context, int chr_id) async {
     CharacteristicWithValue data =
       await ble_device.peripheral.readCharacteristic(uuid(), uuid(chr_id));
     switch(chr_id) {
-      case 0x01: ble_control = data.value; break;
-      case 0x02: ble_strip = data.value; break;
-      case 0x04: ble_cronbuf = data.value; break;
+      case 0x02: ble_control = data.value; break;
+      case 0x03: ble_strip = data.value; break;
+      case 0x05: ble_cronbuf = data.value; break;
     }
     return data.value;
   } on BleError {
@@ -41,9 +41,9 @@ void ble_write(BuildContext context, int chr_id, [Uint8List value0]) async {
     Uint8List value = value0;
     if(value == null) {
       switch(chr_id) {
-        case 0x01: value = ble_control; break;
-        case 0x02: value = ble_strip; break;
-        case 0x04: value = ble_cronbuf; break;
+        case 0x02: value = ble_control; break;
+        case 0x03: value = ble_strip; break;
+        case 0x05: value = ble_cronbuf; break;
       }
     }
     if(value != null) {
