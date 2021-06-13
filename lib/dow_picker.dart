@@ -7,8 +7,8 @@ class DowPicker extends StatefulWidget {
   final List<bool> ctrl;
 
   const DowPicker({
-    Key key,
-    this.ctrl,
+    Key? key,
+    required this.ctrl,
   }) : super(key: key);
 
   static init() => [false, false, false, false, false, false, false];
@@ -18,11 +18,12 @@ class DowPicker extends StatefulWidget {
 }
 
 class _DowPickerState extends State<DowPicker> {
-  List<bool> ctrl;
+  late List<bool> ctrl;
 
   @override
   void initState() {
     ctrl = widget.ctrl;
+    super.initState();
   }
 
   Widget tile(int index, String title) {
@@ -30,7 +31,7 @@ class _DowPickerState extends State<DowPicker> {
       title: Text(title),
       controlAffinity: ListTileControlAffinity.leading,
       value: ctrl[index],
-      onChanged: (state) => setState(() => ctrl[index] = state),
+      onChanged: (state) => setState(() => ctrl[index] = state!),
     );
   }
 

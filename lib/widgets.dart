@@ -72,7 +72,7 @@ ThemeData app_theme() {
   );
 }
 
-Widget loader(String title, [String subtitle]) {
+Widget loader(String title, [String? subtitle]) {
   return Center(child: Card(
     child: Padding(
       child: ListTile(
@@ -90,7 +90,7 @@ Widget loader(String title, [String subtitle]) {
 }
 
 Widget card_unified({
-  Widget child,
+  required Widget child,
   double top=12,
   double bottom=12,
   double left=16,
@@ -117,23 +117,23 @@ Widget card_unified({
   }
 }
 
-Widget card_unified_nopad({Widget child, bool transarent=false}) {
+Widget card_unified_nopad({required Widget child, bool transarent=false}) {
   return card_unified(child: child, top: 0, bottom: 0, left: 0, right: 0, transarent: transarent);
 }
 
-Widget icon_adaptive(IconData material_icon, IconData cupertino_icon, {Color color}) {
+Widget icon_adaptive(IconData material_icon, IconData cupertino_icon, {Color? color}) {
   return Icon(Platform.isIOS ? cupertino_icon : material_icon, color: color);
 }
 
 Widget text_field_adaptive({
-  TextEditingController controller,
-  int max_length,
+  required TextEditingController controller,
+  int? max_length,
   int max_lines=1,
   bool enabled=true,
   bool autofocus=false,
   bool obscure_text=false,
   bool numpad=false,
-  ValueChanged<String> on_submitted,
+  required ValueChanged<String> on_submitted,
 }) {
   if(Platform.isIOS) {
     return CupertinoTextField(
@@ -183,12 +183,12 @@ void time_picker_adaptive(BuildContext context, TimeOfDay initial, ValueChanged<
     );
     if(on_changed != null) on_changed(initial);
   } else {
-    TimeOfDay time = await showTimePicker(context: context, initialTime: initial);
+    TimeOfDay? time = await showTimePicker(context: context, initialTime: initial);
     if(on_changed != null && time != null) on_changed(time);
   }
 }
 
-Widget big_button_adaptive(BuildContext context, String label, IconData icon, ValueGetter on_tap) {
+Widget big_button_adaptive(BuildContext context, String label, IconData icon, ValueGetter? on_tap) {
   if(Platform.isIOS) {
     return CupertinoButton(
       child: Text(label),

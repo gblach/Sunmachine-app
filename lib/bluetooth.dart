@@ -1,88 +1,58 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:flutter_ble_lib/flutter_ble_lib.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
-ScanResult ble_device;
-Uint8List ble_control;
-Uint8List ble_strip;
-Uint8List ble_cronbuf;
-List<Map<String,dynamic>> board_crontab;
+class Characteristic {
+  Characteristic._();
+  static late BluetoothCharacteristic device_name;
+  static late BluetoothCharacteristic idv;
+  static late BluetoothCharacteristic control;
+  static late BluetoothCharacteristic strip;
+  static late BluetoothCharacteristic light_cur;
+  static late BluetoothCharacteristic cronbuf;
+  static late BluetoothCharacteristic unix_time;
+  static late BluetoothCharacteristic timezone;
+}
+
+late BluetoothDevice ble_device;
+late List<int> ble_control;
+late List<int> ble_strip;
+late List<int> ble_cronbuf;
+late List<Map<String,dynamic>> board_crontab;
 final int board_crontab_size = 10;
 
-String uuid([int xx=0]) {
-  if(xx < 256) {
-    String XX = xx.toRadixString(16).padLeft(2, '0');
-    return '201634${XX}-F704-4E77-9ACC-07B7ADE2D0FE';
-  } else {
-    String XXXX = xx.toRadixString(16).padLeft(4, '0');
-    return '0000${XXXX}-0000-1000-8000-00805F9B34FB';
-  }
-}
-
-Future<Uint8List> ble_read(BuildContext context, int chr_id) async {
-  try {
-    CharacteristicWithValue data =
-      await ble_device.peripheral.readCharacteristic(uuid(), uuid(chr_id));
-    switch(chr_id) {
-      case 0x02: ble_control = data.value; break;
-      case 0x03: ble_strip = data.value; break;
-      case 0x05: ble_cronbuf = data.value; break;
-    }
-    return data.value;
-  } on BleError {
-    Navigator.popUntil(context, ModalRoute.withName('/'));
-  }
-}
-
-void ble_write(BuildContext context, int chr_id, [Uint8List value0]) async {
-  try {
-    Uint8List value = value0;
-    if(value == null) {
-      switch(chr_id) {
-        case 0x02: value = ble_control; break;
-        case 0x03: value = ble_strip; break;
-        case 0x05: value = ble_cronbuf; break;
+void map_characteristics(List<BluetoothService> services) {
+  for(final BluetoothService s in services) {
+    for(final BluetoothCharacteristic c in s.characteristics) {
+      switch(c.uuid.toString().toLowerCase()) {
+        case '00002a00-0000-1000-8000-00805f9b34fb':
+          Characteristic.device_name = c;
+          break;
+        case '20163401-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.idv = c;
+          break;
+        case '20163402-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.control = c;
+          break;
+        case '20163403-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.strip = c;
+          break;
+        case '20163404-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.light_cur = c;
+          break;
+        case '20163405-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.cronbuf = c;
+          break;
+        case '20163406-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.unix_time = c;
+          break;
+        case '20163407-f704-4e77-9acc-07b7ade2d0fe':
+          Characteristic.timezone = c;
+          break;
       }
     }
-    if(value != null) {
-      await ble_device.peripheral.writeCharacteristic(uuid(), uuid(chr_id), value, true);
-    }
-  } on BleError {
-    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 }
 
-Future<String> ble_read_name(BuildContext context) async {
-  if(Platform.isIOS) {
-    return ble_device.peripheral.name;
-  } else {
-    try {
-      CharacteristicWithValue data =
-        await ble_device.peripheral.readCharacteristic(uuid(0x1800), uuid(0x2a00));
-      return String.fromCharCodes(data.value);
-    } on BleError {
-      Navigator.popUntil(context, ModalRoute.withName('/'));
-    }
-  }
-}
-
-void ble_write_name(BuildContext context, String value) async {
-  try {
-    await ble_device.peripheral.writeCharacteristic(
-      uuid(0x1800), uuid(0x2a00), Uint8List.fromList(value.codeUnits), true);
-  } on BleError {
-    Navigator.popUntil(context, ModalRoute.withName('/'));
-  }
-}
-
-StreamSubscription<CharacteristicWithValue> ble_monitor(int chr_id, ValueSetter<Uint8List> callback) {
-  return ble_device.peripheral.monitorCharacteristic(uuid(), uuid(chr_id))
-    .listen((CharacteristicWithValue data) => callback(data.value));
-}
-
-bool board_channel(int chan, [bool value]) {
+bool board_channel(int chan, [bool? value]) {
   if(value != null) {
     if(value) ble_control[0] ^= 0x10 << chan;
     else ble_control[0] &= ~(0x10 << chan);
@@ -91,14 +61,14 @@ bool board_channel(int chan, [bool value]) {
   return ble_control[0] & (0x10 << chan) != 0;
 }
 
-int board_mode([int value]) {
+int board_mode([int? value]) {
   if(value != null) {
     ble_control[0] = (ble_control[0] & 0xf0) + value;
   }
   return ble_control[0] & 0x0f;
 }
 
-int board_brightness(int chan, [int value]) {
+int board_brightness(int chan, [int? value]) {
   if(chan < 2) {
     if(value != null) {
       return ble_control[chan+1] = value;
@@ -112,7 +82,7 @@ int board_brightness(int chan, [int value]) {
   }
 }
 
-int board_hue(int chan, [int value]) {
+int board_hue(int chan, [int? value]) {
   if(chan < 2) return -1;
   int offset = (chan - 2) * 6;
   if(value != null) {
@@ -123,7 +93,7 @@ int board_hue(int chan, [int value]) {
   return (ble_strip[2 + offset] | ble_strip[3 + offset] << 8);
 }
 
-int board_saturation(int chan, [int value]) {
+int board_saturation(int chan, [int? value]) {
   if(chan < 2) return -1;
   int offset = (chan - 2) * 6;
   if(value != null) {
@@ -132,28 +102,28 @@ int board_saturation(int chan, [int value]) {
   return ble_strip[4 + offset];
 }
 
-int board_timeout([int value]) {
+int board_timeout([int? value]) {
   if(value != null) {
     return ble_control[3] = value;
   }
   return ble_control[3];
 }
 
-int board_light([int value]) {
+int board_light([int? value]) {
   if(value != null) {
     return ble_control[4] = value;
   }
   return ble_control[4];
 }
 
-int board_speed([int value]) {
+int board_speed([int? value]) {
   if(value != null) {
     return ble_control[5] = value;
   }
   return ble_control[5];
 }
 
-int board_pixlen(int chan, [int value]) {
+int board_pixlen(int chan, [int? value]) {
   if(chan < 2) return -1;
   int offset = (chan - 2) * 6;
   if(value != null) {
@@ -163,7 +133,7 @@ int board_pixlen(int chan, [int value]) {
   return (ble_strip[0 + offset] | ble_strip[1 + offset] << 8);
 }
 
-int board_pixtype(int chan, [int value]) {
+int board_pixtype(int chan, [int? value]) {
   if(chan < 2) return -1;
   int offset = (chan - 2) * 6;
   if(value != null) {

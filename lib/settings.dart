@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'bluetooth.dart';
 import 'widgets.dart';
 
@@ -16,17 +16,17 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   bool _mutex = true;
   TextEditingController _name_ctrl = TextEditingController();
-  int _timeout;
-  int _light;
+  late int _timeout;
+  late int _light;
   int _light_cur = 0;
-  int _speed;
-  List<bool> _channel;
-  List<TextEditingController> _pixlen_ctrl;
-  List<int> _pixtype;
-  StreamSubscription _light_sub;
+  late int _speed;
+  late List<bool> _channel;
+  late List<TextEditingController> _pixlen_ctrl;
+  late List<int> _pixtype;
+  StreamSubscription<List<int>>? _light_sub;
 
   void didChangeDependencies() async {
-    final String name = await ble_read_name(context);
+    final String name = 'Sunmachine A0A1'; //FIXME await ble_read_name(context);
 
     setState(() {
       _mutex = false;
@@ -50,19 +50,26 @@ class _SettingsState extends State<Settings> {
       ];
     });
 
-    _light_sub = ble_monitor(0x04, (Uint8List value) {
-      setState(() => _light_cur = (value[0] | value[1] << 8));
+    _light_sub = Characteristic.light_cur.value.listen((List<int> value) {
+      if(value.isNotEmpty) {
+        setState(() => _light_cur = (value[0] | value[1] << 8));
+      }
     });
+    Characteristic.light_cur.setNotifyValue(true);
   }
 
   @override
   void dispose() {
     _light_sub?.cancel();
+    final CharacteristicProperties props = Characteristic.light_cur.properties;
+    if(props.notify || props.indicate) {
+      Characteristic.light_cur.setNotifyValue(false);
+    }
     super.dispose();
   }
 
   void _on_rename(String value) {
-    if(value.length > 0) ble_write_name(context, value);
+    if(value.isNotEmpty) Characteristic.device_name.write(value.codeUnits);
   }
 
   void _on_timeout(int value) {
@@ -71,7 +78,7 @@ class _SettingsState extends State<Settings> {
 
   void _on_timeout_end(int value) {
     board_timeout(value);
-    ble_write(context, 0x02);
+    Characteristic.control.write(ble_control);
   }
 
   void _on_ambient_light(int value) {
@@ -80,7 +87,7 @@ class _SettingsState extends State<Settings> {
 
   void _on_ambient_light_end(int value) {
     board_light(value);
-    ble_write(context, 0x02);
+    Characteristic.control.write(ble_control);
   }
 
   void _on_speed(int value) {
@@ -89,24 +96,24 @@ class _SettingsState extends State<Settings> {
 
   void _on_speed_end(int value) {
     board_speed(value.toInt());
-    ble_write(context, 0x02);
+    Characteristic.control.write(ble_control);
   }
 
   void _on_channel(int chan, bool value) {
     setState(() => _channel[chan] = value);
     board_channel(chan, value);
-    ble_write(context, 0x02);
+    Characteristic.control.write(ble_control);
   }
 
   void _on_pixlen(int chan, String value) {
     board_pixlen(chan, int.parse(value));
-    ble_write(context, 0x03);
+    Characteristic.strip.write(ble_strip);
   }
 
   void _on_pixtype(int chan, String value) {
     setState(() => _pixtype[chan-2] = board_pixtype(chan, PIXTYPE.indexOf(value)));
     if(_pixtype[chan-2] == 1 && board_hue(chan) < 120) board_hue(chan, 120);
-    ble_write(context, 0x03);
+    Characteristic.strip.write(ble_strip);
   }
 
   void _goto_scheduler() {
@@ -116,7 +123,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(ble_device.peripheral.name)),
+      appBar: AppBar(title: Text(ble_device.name)),
       body: _mutex ? loader('Loading settings ...') : _build_body(),
     );
   }
@@ -143,7 +150,7 @@ class _SettingsState extends State<Settings> {
             Text('Rename'),
             Text(
               'Need application restart',
-              style: TextStyle(color: Theme.of(context).textTheme.caption.color),
+              style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -203,7 +210,7 @@ class _SettingsState extends State<Settings> {
         children: [
           Text(
             'Current ambient light intensity',
-            style: TextStyle(color: Theme.of(context).textTheme.caption.color),
+            style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
           ),
           Text(
             '${_light_cur} lx',
@@ -264,7 +271,7 @@ class _SettingsState extends State<Settings> {
       value: _channel[chan],
       controlAffinity: ListTileControlAffinity.leading,
       contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      onChanged: (bool value) => _on_channel(chan, value),
+      onChanged: (bool? value) => _on_channel(chan, value!),
     ));
   }
 
@@ -277,7 +284,7 @@ class _SettingsState extends State<Settings> {
           value: _channel[chan],
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-          onChanged: (bool value) => _on_channel(chan, value),
+          onChanged: (bool? value) => _on_channel(chan, value!),
         ),
         Padding(
           child: Column(children: [
@@ -304,7 +311,7 @@ class _SettingsState extends State<Settings> {
                 }).toList(),
                 underline: Container(),
                 onChanged: _channel[chan]
-                  ? (String value) => _on_pixtype(chan, value) : null,
+                  ? (String? value) => _on_pixtype(chan, value!) : null,
               ),
             ]),
             SizedBox(height: _channel[chan] ? 0 : 6),

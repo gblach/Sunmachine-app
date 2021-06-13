@@ -15,7 +15,7 @@ class _SchedulerState extends State<Scheduler> {
 
   @override
   void didChangeDependencies() async {
-    await ble_read(context, 0x05);
+    ble_cronbuf = await Characteristic.cronbuf.read();
     board_cronbuf_to_crontab();
     _refresh();
     super.didChangeDependencies();
@@ -80,14 +80,14 @@ class _SchedulerState extends State<Scheduler> {
     final int index = board_crontab.indexWhere((dynamic job) => job['_key'] == key);
     setState(() => board_crontab[index]['enabled'] = state ? 1 : 0);
     board_crontab_to_cronbuf();
-    ble_write(context, 0x05);
+    Characteristic.cronbuf.write(ble_cronbuf);
   }
 
   void _on_delete(String key) async {
     final int index = board_crontab.indexWhere((dynamic job) => job['_key'] == key);
     setState(() => board_crontab.removeAt(index));
     board_crontab_to_cronbuf();
-    ble_write(context, 0x05);
+    Characteristic.cronbuf.write(ble_cronbuf);
   }
 
   void _goto_scheduler_new() {
@@ -98,7 +98,7 @@ class _SchedulerState extends State<Scheduler> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ble_device.peripheral.name),
+        title: Text(ble_device.name),
         actions: [IconButton(
           icon: icon_adaptive(Icons.add, CupertinoIcons.add),
           onPressed: _mutex || board_crontab.length >= board_crontab_size

@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ble_lib/flutter_ble_lib.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:location/location.dart';
 import 'bluetooth.dart';
 import 'device.dart';
@@ -12,7 +13,7 @@ import 'scheduler.dart';
 import 'scheduler_new.dart';
 import 'widgets.dart';
 
-enum Connection { connecting, discovering }
+enum ConnStage { connecting, discovering }
 
 class ResultTime {
   ScanResult result;
@@ -45,15 +46,15 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> with WidgetsBindingObserver {
-  BleManager _bleManager = BleManager();
+  static const platform = const MethodChannel('pl.blach.sunmachine/native');
   List<ResultTime> _results = [];
-  Connection _connection = null;
-  StreamSubscription<PeripheralConnectionState> _conn_sub;
-  Timer _cleanup_timer;
+  ConnStage? _conn_stage;
+  StreamSubscription<ScanResult>? _scan_sub;
+  Timer? _cleanup_timer;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if(ModalRoute.of(context).isCurrent) {
+    if(ModalRoute.of(context)!.isCurrent) {
       switch(state) {
         case AppLifecycleState.paused: _stop_scan(); break;
         case AppLifecycleState.resumed: _start_scan(); break;
@@ -65,28 +66,23 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
-    initStateAsync();
-    super.initState();
-  }
-
-  void initStateAsync() async {
-    await _bleManager.createClient();
+    WidgetsBinding.instance!.addObserver(this);
     _start_scan();
+    super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     _stop_scan();
-    _bleManager.destroyClient();
     super.dispose();
   }
 
   Future<void> _start_scan() async {
     if(Platform.isAndroid) {
-      if(await _bleManager.bluetoothState() == BluetoothState.POWERED_OFF) {
-        await _bleManager.enableRadio();
+      if(! await FlutterBlue.instance.isOn) {
+        await platform.invokeMethod('btenable');
+        while(! await FlutterBlue.instance.isOn);
       }
 
       AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
@@ -103,14 +99,17 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       _cleanup_timer = Timer.periodic(Duration(seconds: 1), _cleanup);
     }
 
-    _bleManager.startPeripheralScan(scanMode: ScanMode.balanced, uuids: [uuid()])
-      .listen((ScanResult result0) {
-        ResultTime result1 = ResultTime(result0, DateTime.now());
-        int index = _results.indexWhere((ResultTime result2) =>
-          result1.result.peripheral.identifier == result2.result.peripheral.identifier);
-        if(index < 0) setState(() => _results.add(result1));
-        else _results[index] = result1;
+    final Guid uuid = Guid('20163400-F704-4E77-9ACC-07B7ADE2D0FE');
+    _scan_sub = FlutterBlue.instance.scan(withServices: [uuid], allowDuplicates: true)
+      .listen((ScanResult result) {
+      final ResultTime result_time = ResultTime(result, DateTime.now());
+      int index = _results.indexWhere((ResultTime _result_time) =>
+        _result_time.result.device.id == result_time.result.device.id);
+      setState(() {
+        if(index < 0) _results.add(result_time);
+        else _results[index] = result_time;
       });
+    });
   }
 
   void _cleanup(Timer timer) {
@@ -121,8 +120,9 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Future<void> _stop_scan() async {
+    _scan_sub?.cancel();
     _cleanup_timer?.cancel();
-    await _bleManager.stopPeripheralScan();
+    await FlutterBlue.instance.stopScan();
     setState(() => _results.clear());
   }
 
@@ -136,28 +136,26 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Future<void> _goto_device(int index) async {
-    ble_device = _results[index].result;
+    late StreamSubscription<BluetoothDeviceState> _conn_sub;
+    ble_device = _results[index].result.device;
     _stop_scan();
 
-    setState(() => _connection = Connection.connecting);
-    await ble_device.peripheral.connect(requestMtu: 160, timeout: Duration(seconds: 15));
-    _conn_sub = ble_device.peripheral.observeConnectionState(completeOnDisconnect: true)
-      .listen((PeripheralConnectionState state) {
-        if(state == PeripheralConnectionState.disconnected) {
-          Navigator.popUntil(context, ModalRoute.withName('/'));
-        }
-      });
+    setState(() => _conn_stage = ConnStage.connecting);
+    await ble_device.connect(autoConnect: false);
+    _conn_sub = ble_device.state.listen((BluetoothDeviceState state) {
+      if(state == BluetoothDeviceState.disconnected) {
+        Navigator.popUntil(context, ModalRoute.withName('/'));
+      }
+    });
 
-    setState(() => _connection = Connection.discovering);
-    await ble_device.peripheral.discoverAllServicesAndCharacteristics();
+    setState(() => _conn_stage = ConnStage.discovering);
+    map_characteristics(await ble_device.discoverServices());
+    await ble_device.requestMtu(65);
 
     Navigator.pushNamed(context, '/device').whenComplete(() async {
-      _conn_sub?.cancel();
-      if(await ble_device.peripheral.isConnected()) {
-        await ble_device.peripheral.disconnectOrCancelConnection();
-      }
-      ble_device = null;
-      setState(() => _connection = null);
+      _conn_sub.cancel();
+      await ble_device.disconnect();
+      setState(() => _conn_stage = null);
       _start_scan();
     });
   }
@@ -169,7 +167,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
         title: Text('Sunmachine'),
         actions: [IconButton(
           icon: icon_adaptive(Icons.refresh, CupertinoIcons.refresh),
-          onPressed: _connection == null ? _restart_scan : null,
+          onPressed: _conn_stage == null ? _restart_scan : null,
         )],
       ),
       body: _build_body(),
@@ -177,16 +175,17 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Widget _build_body() {
-    if(_connection != null) {
-      switch(_connection) {
-        case Connection.connecting: return loader('Connecting ...', 'Wait while connecting');
-        case Connection.discovering: return loader('Connecting ...', 'Wait while discovering services');
-      }
-    }
-    if(_results.length == 0) return _build_intro();
-    return _build_list();
-  }
+    switch(_conn_stage) {
+      case ConnStage.connecting:
+        return loader('Connecting ...', 'Wait while connecting');
 
+      case ConnStage.discovering:
+        return loader('Connecting ...', 'Wait while discovering services');
+
+      case null:
+        return _results.isEmpty ? _build_intro() : _build_list();
+    }
+  }
 
   Widget _build_intro() {
     return Column(
@@ -223,7 +222,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
             child: Align(
               child: Text(
                 'Light sources',
-                style: TextStyle(color: Theme.of(context).textTheme.caption.color),
+                style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
               ),
               alignment: Alignment.centerLeft,
             ),
@@ -246,7 +245,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       child: ListTileTheme(
          child: ListTile(
           leading: icon_adaptive(Icons.lightbulb_outline, CupertinoIcons.lightbulb),
-          title: Text(_results[index].result.peripheral.name),
+          title: Text(_results[index].result.device.name),
           trailing: icon_adaptive(Icons.chevron_right, CupertinoIcons.chevron_right),
           contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onTap: () => _goto_device(index),

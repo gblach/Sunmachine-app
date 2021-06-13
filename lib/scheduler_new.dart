@@ -13,10 +13,10 @@ class SchedulerNew extends StatefulWidget {
 class _SchedulerNewState extends State<SchedulerNew> {
   bool _is_valid = false;
   List<bool> _dow_ctrl = DowPicker.init();
-  TimeOfDay _time;
-  int _routine;
-  int _chan;
-  int _value;
+  TimeOfDay? _time;
+  int? _routine;
+  int? _chan;
+  int? _value;
 
   void _on_dow() {
     dow_picker_adaptive(context,
@@ -24,8 +24,8 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   void _on_time() {
-    TimeOfDay time = _time != null ? _time : TimeOfDay.now();
-    time_picker_adaptive(context, time, (TimeOfDay time) {
+    TimeOfDay? time = _time != null ? _time : TimeOfDay.now();
+    time_picker_adaptive(context, time!, (TimeOfDay time) {
       _time = time;
       _validate();
     });
@@ -59,11 +59,11 @@ class _SchedulerNewState extends State<SchedulerNew> {
       switch(_routine) {
         case 2:
         case 3:
-          if(board_pixtype(_chan) != 0) _chan = null;
+          if(board_pixtype(_chan!) != 0) _chan = null;
           break;
 
         case 4:
-          if(board_pixtype(_chan) != 1) _chan = null;
+          if(board_pixtype(_chan!) != 1) _chan = null;
           break;
       }
     }
@@ -74,10 +74,10 @@ class _SchedulerNewState extends State<SchedulerNew> {
   void _value_default() {
     switch(_routine) {
       case 0: _value = null; break;
-      case 1: _value = _chan != null ? board_brightness(_chan) : 10; break;
-      case 2: _value = _chan != null ? board_hue(_chan) : 0; break;
-      case 3: _value = _chan != null ? board_saturation(_chan) : 0; break;
-      case 4: _value = _chan != null ? board_hue(_chan) : 120; break;
+      case 1: _value = _chan != null ? board_brightness(_chan!) : 10; break;
+      case 2: _value = _chan != null ? board_hue(_chan!) : 0; break;
+      case 3: _value = _chan != null ? board_saturation(_chan!) : 0; break;
+      case 4: _value = _chan != null ? board_hue(_chan!) : 120; break;
     }
   }
 
@@ -146,27 +146,27 @@ class _SchedulerNewState extends State<SchedulerNew> {
     switch(_routine) {
       case 0:
         valid++;
-        if(_value != null && 0 <= _value && _value <= 3) valid++;
+        if(_value != null && 0 <= _value! && _value! <= 3) valid++;
         break;
 
       case 1:
-        if(_chan != null && 0 <= _chan && _chan <= 3) valid++;
-        if(_value != null && 0 <= _value && _value <= 100) valid++;
+        if(_chan != null && 0 <= _chan! && _chan! <= 3) valid++;
+        if(_value != null && 0 <= _value! && _value! <= 100) valid++;
         break;
 
       case 2:
-        if(_chan != null && 2 <= _chan && _chan <= 3) valid++;
-        if(_value != null && 0 <= _value && _value <= 360) valid++;
+        if(_chan != null && 2 <= _chan! && _chan! <= 3) valid++;
+        if(_value != null && 0 <= _value! && _value! <= 360) valid++;
         break;
 
       case 3:
-        if(_chan != null && 2 <= _chan && _chan <= 3) valid++;
-        if(_value != null && 0 <= _value && _value <= 100) valid++;
+        if(_chan != null && 2 <= _chan! && _chan! <= 3) valid++;
+        if(_value != null && 0 <= _value! && _value! <= 100) valid++;
         break;
 
       case 4:
-        if(_chan != null && 2 <= _chan && _chan <= 3) valid++;
-        if(_value != null && 120 <= _value && _value <= 360) valid++;
+        if(_chan != null && 2 <= _chan! && _chan! <= 3) valid++;
+        if(_value != null && 120 <= _value! && _value! <= 360) valid++;
         break;
     }
 
@@ -178,20 +178,20 @@ class _SchedulerNewState extends State<SchedulerNew> {
     if(_is_valid) {
       int dow = 0;
       for(int i=0; i<_dow_ctrl.length; i++) {
-        dow ^= _dow_ctrl[i] ? pow(2, i) : 0;
+        dow ^= _dow_ctrl[i] ? pow(2, i).toInt() : 0;
       }
 
       board_crontab.add({
         'enabled': 1,
         'dow': dow,
-        'hh': _time.hour,
-        'mm': _time.minute,
-        'routine': _routine < 4 ? _routine : 2,
-        'chan': _routine > 0 ? _chan : 0,
+        'hh': _time!.hour,
+        'mm': _time!.minute,
+        'routine': _routine! < 4 ? _routine : 2,
+        'chan': _routine! > 0 ? _chan : 0,
         'value': _value,
       });
       board_crontab_to_cronbuf();
-      ble_write(context, 0x05);
+      Characteristic.cronbuf.write(ble_cronbuf);
     }
 
     Navigator.pop(context);
@@ -201,7 +201,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ble_device.peripheral.name),
+        title: Text(ble_device.name),
         actions: [IconButton(
           icon: icon_adaptive(Icons.check, CupertinoIcons.checkmark_alt),
           onPressed: _is_valid ? _on_save : null,
@@ -259,7 +259,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   Widget _build_time() {
     return card_unified_nopad(child: ListTile(
       title: Text(_time != null
-        ? '${_time.hour}:${_time.minute.toString().padLeft(2, '0')}'
+        ? '${_time!.hour}:${_time!.minute.toString().padLeft(2, '0')}'
         : ''),
       subtitle: Text('time'),
       onTap: _on_time,
@@ -268,7 +268,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
 
   Widget _build_routine() {
     return card_unified_nopad(child: ListTile(
-      title: Text(_routine != null ? ROUTINE[_routine] : ''),
+      title: Text(_routine != null ? ROUTINE[_routine!] : ''),
       subtitle: Text('routine'),
       onTap: _on_routine,
     ));
@@ -278,7 +278,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
     if(_routine == null || _routine == 0) return SizedBox();
 
     return card_unified_nopad(child: ListTile(
-      title: Text(_chan != null ? 'Channel #${_chan+1}' : ''),
+      title: Text(_chan != null ? 'Channel #${_chan!+1}' : ''),
       subtitle: Text('channel'),
       onTap: _on_chan,
     ));
@@ -297,7 +297,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
 
   Widget _build_mode() {
     return card_unified_nopad(child: ListTile(
-      title: Text(_value != null ? MODE[_value.toInt()] : ''),
+      title: Text(_value != null ? MODE[_value!.toInt()] : ''),
       subtitle: Text('mode'),
       onTap: _on_mode,
     ));
@@ -307,7 +307,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
     return card_unified(
       child: Column(children: [
         Slider.adaptive(
-          value: _value.toDouble(), min: 10, max: 100, divisions: 90,
+          value: _value!.toDouble(), min: 10, max: 100, divisions: 90,
           onChanged: _on_value,
           onChangeEnd: (double value) => _validate(),
         ),
@@ -315,7 +315,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
           children: [
             Text(
               ROUTINE[1].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption.color)
+              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
               '${_value} %',
@@ -333,7 +333,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
     return card_unified(
       child: Column(children: [
         Slider.adaptive(
-          value: _value.toDouble(), min: 0, max: 360, divisions: 180,
+          value: _value!.toDouble(), min: 0, max: 360, divisions: 180,
           onChanged: _on_value, onChangeEnd: (double value) => _validate(),
         ),
         gradient_hue(),
@@ -342,7 +342,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
           children: [
             Text(
               ROUTINE[2].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption.color)
+              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
               '${_value} \u00B0',
@@ -360,16 +360,16 @@ class _SchedulerNewState extends State<SchedulerNew> {
     return card_unified(
       child: Column(children: [
         Slider.adaptive(
-          value: _value.toDouble(), min: 0, max: 100, divisions: 100,
+          value: _value!.toDouble(), min: 0, max: 100, divisions: 100,
           onChanged: _on_value, onChangeEnd: (double value) => _validate(),
         ),
-        gradient_saturation(_chan != null ? board_hue(_chan) : 224),
+        gradient_saturation(_chan != null ? board_hue(_chan!) : 224),
         SizedBox(height: 12),
         Row(
           children: [
             Text(
               ROUTINE[3].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption.color)
+              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
               '${_value} %',
@@ -387,7 +387,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
     return card_unified(
       child: Column(children: [
         Slider.adaptive(
-          value: _value.toDouble(), min: 120, max: 360, divisions: 120,
+          value: _value!.toDouble(), min: 120, max: 360, divisions: 120,
           onChanged: _on_value, onChangeEnd: (double value) => _validate(),
         ),
         gradient_temperature(),
@@ -396,10 +396,10 @@ class _SchedulerNewState extends State<SchedulerNew> {
           children: [
             Text(
               ROUTINE[4].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption.color)
+              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
-              '${hue_to_temp(_value)} K',
+              '${hue_to_temp(_value!)} K',
               style: TextStyle(color: Theme.of(context).accentColor)
             ),
           ],
