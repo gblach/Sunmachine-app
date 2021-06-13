@@ -20,7 +20,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
 
   void _on_dow() {
     dow_picker_adaptive(context,
-      'Choose days of the week', DowPicker(ctrl: _dow_ctrl), _validate);
+      'Select days of the week', DowPicker(ctrl: _dow_ctrl), _validate);
   }
 
   void _on_time() {

@@ -224,11 +224,11 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
             child: Align(
               child: Text(
                 'Light sources',
-                style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
+                style: TextStyle(color: Colors.grey[100]),
               ),
               alignment: Alignment.centerLeft,
             ),
-            color: Theme.of(context).cardTheme.color,
+            color: Theme.of(context).primaryColor,
             padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           Expanded(child: ListView.separated(
