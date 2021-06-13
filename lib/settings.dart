@@ -26,7 +26,8 @@ class _SettingsState extends State<Settings> {
   StreamSubscription<List<int>>? _light_sub;
 
   void didChangeDependencies() async {
-    final String name = 'Sunmachine A0A1'; //FIXME await ble_read_name(context);
+    final String name = Platform.isIOS ? ble_device.name
+      : String.fromCharCodes(await Characteristic.device_name.read());
 
     setState(() {
       _mutex = false;
