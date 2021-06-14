@@ -10,10 +10,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.3
-  device_info: ^2.0.2
+  device_info_plus: ^1.0.1
   flutter_blue: ^0.8.0
   flutter_native_timezone: ^2.0.0
-  location: ^4.2.3
+  location: ^4.3.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -86,7 +86,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       }
 
       AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
-      if(androidInfo.version.sdkInt >= 23) {
+      if(androidInfo.version.sdkInt! >= 23) {
         Location location = Location();
         while(await location.hasPermission() != PermissionStatus.granted) {
           await location.requestPermission();
