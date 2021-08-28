@@ -15,7 +15,7 @@ class _SchedulerState extends State<Scheduler> {
 
   @override
   void didChangeDependencies() async {
-    ble_cronbuf = await Characteristic.cronbuf.read();
+    ble_cronbuf = await ble.readCharacteristic(Characteristic.cronbuf);
     board_cronbuf_to_crontab();
     _refresh();
     super.didChangeDependencies();
@@ -80,14 +80,14 @@ class _SchedulerState extends State<Scheduler> {
     final int index = board_crontab.indexWhere((dynamic job) => job['_key'] == key);
     setState(() => board_crontab[index]['enabled'] = state ? 1 : 0);
     board_crontab_to_cronbuf();
-    Characteristic.cronbuf.write(ble_cronbuf);
+    characteristic_write(Characteristic.cronbuf);
   }
 
   void _on_delete(String key) async {
     final int index = board_crontab.indexWhere((dynamic job) => job['_key'] == key);
     setState(() => board_crontab.removeAt(index));
     board_crontab_to_cronbuf();
-    Characteristic.cronbuf.write(ble_cronbuf);
+    characteristic_write(Characteristic.cronbuf);
   }
 
   void _goto_scheduler_new() {

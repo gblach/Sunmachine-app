@@ -4,7 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:location/location.dart';
 import 'bluetooth.dart';
 import 'device.dart';
@@ -15,10 +15,10 @@ import 'widgets.dart';
 
 enum ConnStage { connecting, discovering }
 
-class ResultTime {
-  ScanResult result;
+class DeviceTime {
+  DiscoveredDevice device;
   DateTime time;
-  ResultTime(this.result, this.time);
+  DeviceTime(this.device, this.time);
 }
 
 void main() => runApp(App());
@@ -47,9 +47,10 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> with WidgetsBindingObserver {
   static const platform = const MethodChannel('pl.blach.sunmachine/native');
-  List<ResultTime> _results = [];
+  List<DeviceTime> _devices = [];
   ConnStage? _conn_stage;
-  StreamSubscription<ScanResult>? _scan_sub;
+  StreamSubscription<DiscoveredDevice>? _scan_sub;
+  late StreamSubscription<void> _conn_sub;
   Timer? _cleanup_timer;
 
   @override
@@ -67,7 +68,17 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
-    _start_scan();
+    ble = FlutterReactiveBle();
+    ble.statusStream.listen((BleStatus status) {
+      switch(status) {
+        case BleStatus.poweredOff: _power_on(); break;
+        case BleStatus.ready: _start_scan(); break;
+        case BleStatus.locationServicesDisabled:
+        case BleStatus.unauthorized:
+        case BleStatus.unsupported:
+        case BleStatus.unknown:
+      }
+    });
     super.initState();
   }
 
@@ -78,13 +89,14 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  void _power_on() {
+    if(Platform.isAndroid) {
+      platform.invokeMethod('btenable');
+    }
+  }
+
   Future<void> _start_scan() async {
     if(Platform.isAndroid) {
-      if(! await FlutterBlue.instance.isOn) {
-        await platform.invokeMethod('btenable');
-        while(! await FlutterBlue.instance.isOn);
-      }
-
       AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
       if(androidInfo.version.sdkInt! >= 23) {
         Location location = Location();
@@ -99,36 +111,36 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       _cleanup_timer = Timer.periodic(Duration(seconds: 1), _cleanup);
     }
 
-    final Guid uuid = Guid('20163400-F704-4E77-9ACC-07B7ADE2D0FE');
-    _scan_sub = FlutterBlue.instance.scan(withServices: [uuid], allowDuplicates: true)
-      .listen((ScanResult result) {
-      final ResultTime result_time = ResultTime(result, DateTime.now());
-      int index = _results.indexWhere((ResultTime _result_time) =>
-        _result_time.result.device.id == result_time.result.device.id);
-      setState(() {
-        if(index < 0) _results.add(result_time);
-        else _results[index] = result_time;
-      });
+    _scan_sub = ble.scanForDevices(withServices: [service_uuid])
+      .listen(_on_device_found, onError: print);
+  }
+
+  void _on_device_found(DiscoveredDevice device) {
+    final DeviceTime device_time = DeviceTime(device, DateTime.now());
+    int index = _devices.indexWhere((DeviceTime _device_time) =>
+      _device_time.device.id == device_time.device.id);
+    setState(() {
+      if(index < 0) _devices.add(device_time);
+      else _devices[index] = device_time;
     });
   }
 
   void _cleanup(Timer timer) {
     DateTime limit = DateTime.now().subtract(Duration(seconds: 5));
-    for(int i=_results.length-1; i>=0; i--) {
-      if(_results[i].time.isBefore(limit)) setState(() => _results.removeAt(i));
+    for(int i=_devices.length-1; i>=0; i--) {
+      if(_devices[i].time.isBefore(limit)) setState(() => _devices.removeAt(i));
     }
   }
 
   Future<void> _stop_scan() async {
-    _scan_sub?.cancel();
+    await _scan_sub?.cancel();
     _cleanup_timer?.cancel();
-    await FlutterBlue.instance.stopScan();
-    setState(() => _results.clear());
+    setState(() => _devices.clear());
   }
 
   Future<void> _restart_scan() async {
     if(Platform.isAndroid) {
-      setState(() => _results.clear());
+      setState(() => _devices.clear());
     } else {
       await _stop_scan();
       _start_scan();
@@ -136,30 +148,37 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Future<void> _goto_device(int index) async {
-    late StreamSubscription<BluetoothDeviceState> _conn_sub;
-    ble_device = _results[index].result.device;
+    ble_device = _devices[index].device;
     _stop_scan();
 
     setState(() => _conn_stage = ConnStage.connecting);
-    await ble_device.connect(autoConnect: false);
-    _conn_sub = ble_device.state.listen((BluetoothDeviceState state) {
-      if(state == BluetoothDeviceState.disconnected) {
-        Navigator.popUntil(context, ModalRoute.withName('/'));
+    _conn_sub = ble.connectToDevice(
+      id: ble_device.id,
+      connectionTimeout: const Duration(seconds: 2),
+    ).listen((ConnectionStateUpdate state) async {
+      switch(state.connectionState) {
+        case DeviceConnectionState.connected: _on_connected(); break;
+        case DeviceConnectionState.disconnected: _on_disconnected(); break;
+        case DeviceConnectionState.connecting:
+        case DeviceConnectionState.disconnecting:
       }
-    });
+    }, onError: print);
+  }
 
+  Future<void> _on_connected() async {
     setState(() => _conn_stage = ConnStage.discovering);
-    map_characteristics(await ble_device.discoverServices());
-    await ble_device.requestMtu(251);
+    await ble.requestMtu(deviceId: ble_device.id, mtu: 251);
+    map_characteristics(await ble.discoverServices(ble_device.id));
 
-    Future.delayed(Duration(milliseconds: 500), () =>
-      Navigator.pushNamed(context, '/device').whenComplete(() async {
-        _conn_sub.cancel();
-        await ble_device.disconnect();
-        setState(() => _conn_stage = null);
-        _start_scan();
-      })
-    );
+    Navigator.pushNamed(context, '/device').whenComplete(() async {
+      await _conn_sub.cancel();
+      setState(() => _conn_stage = null);
+      _start_scan();
+    });
+  }
+
+  void _on_disconnected() {
+    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
   @override
@@ -185,7 +204,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
         return loader('Connecting ...', 'Wait while discovering services');
 
       case null:
-        return _results.isEmpty ? _build_intro() : _build_list();
+        return _devices.isEmpty ? _build_intro() : _build_list();
     }
   }
 
@@ -211,7 +230,8 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Widget _build_list() {
-    double top = (MediaQuery.of(context).size.height - MediaQuery.of(context).size.width) / 3;
+    Size size = MediaQuery.of(context).size;
+    double top = (size.height - size.width) / 3;
 
     return RefreshIndicator(
       child: Stack(children: [
@@ -232,7 +252,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
             padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           Expanded(child: ListView.separated(
-            itemCount: _results.length,
+            itemCount: _devices.length,
             itemBuilder: _build_list_item,
             separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
           )),
@@ -247,7 +267,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       child: ListTileTheme(
          child: ListTile(
           leading: icon_adaptive(Icons.lightbulb_outline, CupertinoIcons.lightbulb),
-          title: Text(_results[index].result.device.name),
+          title: Text(_devices[index].device.name),
           trailing: icon_adaptive(Icons.chevron_right, CupertinoIcons.chevron_right),
           contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onTap: () => _goto_device(index),

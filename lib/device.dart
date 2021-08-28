@@ -33,12 +33,12 @@ class _DeviceState extends State<Device> {
 
     final unix_time = ByteData(8);
     unix_time.setInt64(0, DateTime.now().millisecondsSinceEpoch ~/ 1000, Endian.little);
-    await Characteristic.unix_time.write(unix_time.buffer.asUint8List());
+    characteristic_write(Characteristic.unix_time, unix_time.buffer.asUint8List());
 
     final String timezone = await FlutterNativeTimezone.getLocalTimezone();
     final Map tzdata = jsonDecode(await rootBundle.loadString('assets/tzdata.json'));
     if(tzdata.containsKey(timezone)) {
-      await Characteristic.timezone.write(tzdata[timezone].codeUnits);
+      characteristic_write(Characteristic.timezone, tzdata[timezone].codeUnits);
     }
 
     super.didChangeDependencies();
@@ -47,8 +47,8 @@ class _DeviceState extends State<Device> {
   Future<void> _refresh() async {
     setState(() => _mutex = true);
 
-    ble_control = await Characteristic.control.read();
-    ble_strip = await Characteristic.strip.read();
+    ble_control = await ble.readCharacteristic(Characteristic.control);
+    ble_strip = await ble.readCharacteristic(Characteristic.strip);
 
     setState(() {
       _mutex = false;
@@ -96,13 +96,13 @@ class _DeviceState extends State<Device> {
       }
     });
     board_mode(_mode.index);
-    Characteristic.control.write(ble_control);
+    characteristic_write(Characteristic.control);
   }
 
   Future<void> _on_mode_radio(Mode? value) async {
     setState(() => _mode = _mode_radio = value!);
     board_mode(_mode.index);
-    Characteristic.control.write(ble_control);
+    characteristic_write(Characteristic.control);
   }
 
   void _on_channel(int chan) {
@@ -115,8 +115,8 @@ class _DeviceState extends State<Device> {
 
   void _on_brightness_end(int chan, int value) {
     board_brightness(chan, value);
-    if(chan < 2) Characteristic.control.write(ble_control);
-    else Characteristic.strip.write(ble_strip);
+    if(chan < 2) characteristic_write(Characteristic.control);
+    else characteristic_write(Characteristic.strip);
   }
 
   void _on_hue(int chan, int value) {
@@ -125,7 +125,7 @@ class _DeviceState extends State<Device> {
 
   void _on_hue_end(int chan, int value) {
     board_hue(chan, value);
-    Characteristic.strip.write(ble_strip);
+    characteristic_write(Characteristic.strip);
   }
 
   void _on_saturation(int chan, int value) {
@@ -134,7 +134,7 @@ class _DeviceState extends State<Device> {
 
   void _on_saturation_end(int chan, int value) {
     board_saturation(chan, value);
-    Characteristic.strip.write(ble_strip);
+    characteristic_write(Characteristic.strip);
   }
 
   void _goto_settings() {

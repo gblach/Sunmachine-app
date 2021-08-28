@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'bluetooth.dart';
 import 'widgets.dart';
 
@@ -27,7 +26,7 @@ class _SettingsState extends State<Settings> {
 
   void didChangeDependencies() async {
     final String name = Platform.isIOS ? ble_device.name
-      : String.fromCharCodes(await Characteristic.device_name.read());
+      : String.fromCharCodes(await ble.readCharacteristic(Characteristic.device_name));
 
     setState(() {
       _mutex = false;
@@ -51,26 +50,19 @@ class _SettingsState extends State<Settings> {
       ];
     });
 
-    _light_sub = Characteristic.light_cur.value.listen((List<int> value) {
-      if(value.isNotEmpty) {
-        setState(() => _light_cur = (value[0] | value[1] << 8));
-      }
-    });
-    Characteristic.light_cur.setNotifyValue(true);
+    _light_sub = ble.subscribeToCharacteristic(Characteristic.light_cur).listen((List<int> value) {
+      if(value.isNotEmpty) setState(() => _light_cur = (value[0] | value[1] << 8));
+    }, onError: print);
   }
 
   @override
   void dispose() {
     _light_sub?.cancel();
-    final CharacteristicProperties props = Characteristic.light_cur.properties;
-    if(props.notify || props.indicate) {
-      Characteristic.light_cur.setNotifyValue(false);
-    }
     super.dispose();
   }
 
   void _on_rename(String value) {
-    if(value.isNotEmpty) Characteristic.device_name.write(value.codeUnits);
+    if(value.isNotEmpty) characteristic_write(Characteristic.device_name, value.codeUnits);
   }
 
   void _on_timeout(int value) {
@@ -79,7 +71,7 @@ class _SettingsState extends State<Settings> {
 
   void _on_timeout_end(int value) {
     board_timeout(value);
-    Characteristic.control.write(ble_control);
+    characteristic_write(Characteristic.control);
   }
 
   void _on_ambient_light(int value) {
@@ -88,7 +80,7 @@ class _SettingsState extends State<Settings> {
 
   void _on_ambient_light_end(int value) {
     board_light(value);
-    Characteristic.control.write(ble_control);
+    characteristic_write(Characteristic.control);
   }
 
   void _on_speed(int value) {
@@ -97,24 +89,24 @@ class _SettingsState extends State<Settings> {
 
   void _on_speed_end(int value) {
     board_speed(value.toInt());
-    Characteristic.control.write(ble_control);
+    characteristic_write(Characteristic.control);
   }
 
   void _on_channel(int chan, bool value) {
     setState(() => _channel[chan] = value);
     board_channel(chan, value);
-    Characteristic.control.write(ble_control);
+    characteristic_write(Characteristic.control);
   }
 
   void _on_pixlen(int chan, String value) {
     board_pixlen(chan, int.parse(value));
-    Characteristic.strip.write(ble_strip);
+    characteristic_write(Characteristic.strip);
   }
 
   void _on_pixtype(int chan, String value) {
     setState(() => _pixtype[chan-2] = board_pixtype(chan, PIXTYPE.indexOf(value)));
     if(_pixtype[chan-2] == 1 && board_hue(chan) < 120) board_hue(chan, 120);
-    Characteristic.strip.write(ble_strip);
+    characteristic_write(Characteristic.strip);
   }
 
   void _goto_scheduler() {

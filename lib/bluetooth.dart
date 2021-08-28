@@ -1,55 +1,53 @@
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+
+Uuid service_uuid = Uuid.parse('20163400-f704-4e77-9acc-07b7ade2d0fe');
 
 class Characteristic {
   Characteristic._();
-  static late BluetoothCharacteristic device_name;
-  static late BluetoothCharacteristic idv;
-  static late BluetoothCharacteristic control;
-  static late BluetoothCharacteristic strip;
-  static late BluetoothCharacteristic light_cur;
-  static late BluetoothCharacteristic cronbuf;
-  static late BluetoothCharacteristic unix_time;
-  static late BluetoothCharacteristic timezone;
+  static late QualifiedCharacteristic device_name;
+  static late QualifiedCharacteristic idv;
+  static late QualifiedCharacteristic control;
+  static late QualifiedCharacteristic strip;
+  static late QualifiedCharacteristic light_cur;
+  static late QualifiedCharacteristic cronbuf;
+  static late QualifiedCharacteristic unix_time;
+  static late QualifiedCharacteristic timezone;
 }
 
-late BluetoothDevice ble_device;
+late FlutterReactiveBle ble;
+late DiscoveredDevice ble_device;
 late List<int> ble_control;
 late List<int> ble_strip;
 late List<int> ble_cronbuf;
 late List<Map<String,dynamic>> board_crontab;
 final int board_crontab_size = 10;
 
-void map_characteristics(List<BluetoothService> services) {
-  for(final BluetoothService s in services) {
-    for(final BluetoothCharacteristic c in s.characteristics) {
-      switch(c.uuid.toString().toLowerCase()) {
-        case '00002a00-0000-1000-8000-00805f9b34fb':
-          Characteristic.device_name = c;
-          break;
-        case '20163401-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.idv = c;
-          break;
-        case '20163402-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.control = c;
-          break;
-        case '20163403-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.strip = c;
-          break;
-        case '20163404-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.light_cur = c;
-          break;
-        case '20163405-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.cronbuf = c;
-          break;
-        case '20163406-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.unix_time = c;
-          break;
-        case '20163407-f704-4e77-9acc-07b7ade2d0fe':
-          Characteristic.timezone = c;
-          break;
+void map_characteristics(List<DiscoveredService> services) {
+  for(final DiscoveredService s in services) {
+    for(final Uuid c in s.characteristicIds) {
+      QualifiedCharacteristic qc = QualifiedCharacteristic(
+        deviceId: ble_device.id, serviceId: s.serviceId, characteristicId: c);
+      switch(c.toString()) {
+        case '00002a00-0000-1000-8000-00805f9b34fb': Characteristic.device_name = qc; break;
+        case '20163401-f704-4e77-9acc-07b7ade2d0fe': Characteristic.idv = qc; break;
+        case '20163402-f704-4e77-9acc-07b7ade2d0fe': Characteristic.control = qc; break;
+        case '20163403-f704-4e77-9acc-07b7ade2d0fe': Characteristic.strip = qc; break;
+        case '20163404-f704-4e77-9acc-07b7ade2d0fe': Characteristic.light_cur = qc; break;
+        case '20163405-f704-4e77-9acc-07b7ade2d0fe': Characteristic.cronbuf = qc; break;
+        case '20163406-f704-4e77-9acc-07b7ade2d0fe': Characteristic.unix_time = qc; break;
+        case '20163407-f704-4e77-9acc-07b7ade2d0fe': Characteristic.timezone = qc; break;
       }
     }
   }
+}
+
+void characteristic_write(QualifiedCharacteristic qc, [List<int>? value0]) {
+  late List<int> value;
+  if(value0 != null) value = value0;
+  else if(qc == Characteristic.control) value = ble_control;
+  else if(qc == Characteristic.strip) value = ble_strip;
+  else if(qc == Characteristic.cronbuf) value = ble_cronbuf;
+  ble.writeCharacteristicWithResponse(qc, value: value);
 }
 
 bool board_channel(int chan, [bool? value]) {
@@ -130,7 +128,7 @@ int board_pixlen(int chan, [int? value]) {
     ble_strip[0 + offset] = value & 0xff;
     ble_strip[1 + offset] = value >> 8;
   }
-  return (ble_strip[0 + offset] | ble_strip[1 + offset] << 8);
+  return ble_strip[0 + offset] | ble_strip[1 + offset] << 8;
 }
 
 int board_pixtype(int chan, [int? value]) {
@@ -161,7 +159,7 @@ void board_cronbuf_to_crontab() {
 }
 
 void board_crontab_to_cronbuf() {
-  ble_cronbuf.fillRange(0, 40, 0);
+  ble_cronbuf.fillRange(0, board_crontab_size * 4, 0);
   for(int i=0; i<board_crontab.length; i++) {
     int offset = i * 4;
     Map<String,dynamic> job = board_crontab[i];
