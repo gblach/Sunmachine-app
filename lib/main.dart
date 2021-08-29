@@ -71,10 +71,10 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     ble = FlutterReactiveBle();
     ble.statusStream.listen((BleStatus status) {
       switch(status) {
-        case BleStatus.poweredOff: _power_on(); break;
+        case BleStatus.poweredOff: _bluetooth_enable(); break;
+        case BleStatus.unauthorized: _location_permission(); break;
+        case BleStatus.locationServicesDisabled: _location_enable(); break;
         case BleStatus.ready: _start_scan(); break;
-        case BleStatus.locationServicesDisabled:
-        case BleStatus.unauthorized:
         case BleStatus.unsupported:
         case BleStatus.unknown:
       }
@@ -89,13 +89,13 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void _power_on() {
+  void _bluetooth_enable() {
     if(Platform.isAndroid) {
       platform.invokeMethod('btenable');
     }
   }
 
-  Future<void> _start_scan() async {
+  Future<void> _location_permission() async {
     if(Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
       if(androidInfo.version.sdkInt! >= 23) {
@@ -103,11 +103,24 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
         while(await location.hasPermission() != PermissionStatus.granted) {
           await location.requestPermission();
         }
+      }
+    }
+  }
+
+  Future<void> _location_enable() async {
+    if(Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      if(androidInfo.version.sdkInt! >= 23) {
+        Location location = Location();
         if(! await location.serviceEnabled()) {
           await location.requestService();
         }
       }
+    }
+  }
 
+  void _start_scan() {
+    if(Platform.isAndroid) {
       _cleanup_timer = Timer.periodic(Duration(seconds: 1), _cleanup);
     }
 
