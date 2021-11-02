@@ -232,7 +232,7 @@
 	"Arctic/Longyearbyen": "CET-1CEST,M3.5.0,M10.5.0/3",
 	"Asia/Aden": "AAA-3",
 	"Asia/Almaty": "AAA-6",
-	"Asia/Amman": "EET-2EEST,M3.5.4/24,M10.5.5/1",
+	"Asia/Amman": "EET-2EEST,M2.5.4/24,M10.5.5/1",
 	"Asia/Anadyr": "AAA-12",
 	"Asia/Aqtau": "AAA-5",
 	"Asia/Aqtobe": "AAA-5",
@@ -516,7 +516,7 @@
 	"Navajo": "MST7MDT,M3.2.0,M11.1.0",
 	"PRC": "CST-8",
 	"PST8PDT": "PST8PDT,M3.2.0,M11.1.0",
-	"Pacific/Apia": "AAA-13BBB,M9.5.0/3,M4.1.0/4",
+	"Pacific/Apia": "AAA-13",
 	"Pacific/Auckland": "NZST-12NZDT,M9.5.0,M4.1.0/3",
 	"Pacific/Bougainville": "AAA-11",
 	"Pacific/Chatham": "AAA-12:45BBB,M9.5.0/2:45,M4.1.0/3:45",
@@ -531,6 +531,7 @@
 	"Pacific/Guam": "ChST-10",
 	"Pacific/Honolulu": "HST10",
 	"Pacific/Johnston": "HST10",
+	"Pacific/Kanton": "AAA-13",
 	"Pacific/Kiritimati": "AAA-14",
 	"Pacific/Kosrae": "AAA-11",
 	"Pacific/Kwajalein": "AAA-12",
@@ -581,5 +582,5 @@
 	"W-SU": "MSK-3",
 	"WET": "WET0WEST,M3.5.0/1,M10.5.0",
 	"Zulu": "UTC0",
-	"_tzdb": "2021a"
+	"_tzdb": "2021e"
 }
