@@ -98,7 +98,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   Future<void> _location_permission() async {
     if(Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
-      if(androidInfo.version.sdkInt! >= 23) {
+      if(23 <= androidInfo.version.sdkInt! && androidInfo.version.sdkInt! <= 30) {
         Location location = Location();
         while(await location.hasPermission() != PermissionStatus.granted) {
           await location.requestPermission();
@@ -110,7 +110,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   Future<void> _location_enable() async {
     if(Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
-      if(androidInfo.version.sdkInt! >= 23) {
+      if(23 <= androidInfo.version.sdkInt! && androidInfo.version.sdkInt! <= 30) {
         Location location = Location();
         if(! await location.serviceEnabled()) {
           await location.requestService();

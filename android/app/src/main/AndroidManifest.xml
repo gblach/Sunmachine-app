@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pl.blach.sunmachine">
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Sunmachine"

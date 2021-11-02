@@ -1,7 +1,7 @@
 name: sunmachine
 description: Sunmachine
 publish_to: 'none'
-version: 0.6.1
+version: 0.6.2
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -10,9 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.3
-  device_info_plus: ^2.1.0
+  device_info_plus: ^3.1.0
   flutter_native_timezone: ^2.0.0
-  flutter_reactive_ble: ^4.0.0
+  flutter_reactive_ble: ^5.0.1
   location: ^4.3.0
 
 dev_dependencies:
