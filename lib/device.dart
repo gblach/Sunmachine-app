@@ -30,7 +30,12 @@ class _DeviceState extends State<Device> {
   late List<int> _saturation;
 
   @override
-  void didChangeDependencies() async {
+  void initState() {
+    initAsync();
+    super.initState();
+  }
+
+  void initAsync() async {
     await _refresh();
 
     final unix_time = ByteData(8);
@@ -42,8 +47,6 @@ class _DeviceState extends State<Device> {
     if(tzdata.containsKey(timezone)) {
       characteristic_write(Characteristic.timezone, tzdata[timezone].codeUnits);
     }
-
-    super.didChangeDependencies();
   }
 
   Future<void> _refresh() async {

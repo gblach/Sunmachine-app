@@ -16,11 +16,15 @@ class _SchedulerState extends State<Scheduler> {
   bool _mutex = true;
 
   @override
-  void didChangeDependencies() async {
+  void initState() async {
+    initAsync();
+    super.initState();
+  }
+
+  void initAsync() async {
     ble_cronbuf = await ble.readCharacteristic(Characteristic.cronbuf);
     board_cronbuf_to_crontab();
     _refresh();
-    super.didChangeDependencies();
   }
 
   void _refresh() {

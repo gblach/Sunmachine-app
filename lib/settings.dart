@@ -27,7 +27,12 @@ class _SettingsState extends State<Settings> {
   StreamSubscription<List<int>>? _light_sub;
 
   @override
-  void didChangeDependencies() async {
+  void initState() {
+    initAsync();
+    super.initState();
+  }
+
+  void initAsync() async {
     final String name = Platform.isIOS ? ble_device.name
       : String.fromCharCodes(await ble.readCharacteristic(Characteristic.device_name));
 
@@ -67,8 +72,6 @@ class _SettingsState extends State<Settings> {
     _light_sub = ble.subscribeToCharacteristic(Characteristic.light_cur).listen((List<int> value) {
       if(value.isNotEmpty) setState(() => _light_cur = (value[0] | value[1] << 8));
     }, onError: print);
-
-    super.didChangeDependencies();
   }
 
   @override
