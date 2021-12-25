@@ -15,7 +15,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   List<bool> _dow_ctrl = DowPicker.init();
   TimeOfDay? _time;
   int? _routine;
-  int? _chan;
+  int? _chan = 2;
   int? _value;
 
   void _on_dow() {
@@ -85,20 +85,36 @@ class _SchedulerNewState extends State<SchedulerNew> {
     List<Map<String,dynamic>> routines = [
       { 'label': ROUTINE[0], 'value': 0 },
     ];
-    if(board_channel(0) || board_channel(1) || board_channel(2) || board_channel(3)) {
-      routines.add({ 'label': ROUTINE[1], 'value': 1 });
-    }
-    if(board_channel(2) && board_pixtype(2) == 0 || board_channel(3) && board_pixtype(3) == 0) {
-      routines.add({ 'label': ROUTINE[2], 'value': 2 });
-      routines.add({ 'label': ROUTINE[3], 'value': 3 });
-    }
-    if(board_channel(2) && board_pixtype(2) == 1 || board_channel(3) && board_pixtype(3) == 1) {
-      routines.add({ 'label': ROUTINE[4], 'value': 4 });
+    switch(board_idv) {
+      case 'SMA1':
+        if(board_channel(0) || board_channel(1) || board_channel(2) || board_channel(3)) {
+          routines.add({ 'label': ROUTINE[1], 'value': 1 });
+        }
+        if(board_channel(2) && board_pixtype(2) == 0 || board_channel(3) && board_pixtype(3) == 0) {
+          routines.add({ 'label': ROUTINE[2], 'value': 2 });
+          routines.add({ 'label': ROUTINE[3], 'value': 3 });
+        }
+        if(board_channel(2) && board_pixtype(2) == 1 || board_channel(3) && board_pixtype(3) == 1) {
+          routines.add({ 'label': ROUTINE[4], 'value': 4 });
+        }
+        break;
+
+      case 'SMA2':
+        routines.add({ 'label': ROUTINE[1], 'value': 1 });
+        if(board_pixtype(2) == 0) {
+          routines.add({ 'label': ROUTINE[2], 'value': 2 });
+          routines.add({ 'label': ROUTINE[3], 'value': 3 });
+        } else {
+          routines.add({ 'label': ROUTINE[4], 'value': 4 });
+        }
+        break;
     }
 
     bottom_sheet_adaptive(context, routines, (dynamic value) {
       _routine = value;
-      _channels();
+      if(board_idv == 'SMA1') {
+        _channels();
+      }
       _value_default();
       _validate();
     });
@@ -212,18 +228,21 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   Widget _build_body() {
+    List<Widget> children = [
+      _build_dow(),
+      _build_time(),
+      _build_routine(),
+    ];
+
+    if(board_idv == 'SMA1') children.add(_build_chan());
+    children.add(_build_value());
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints viewportConstraints) {
         return SingleChildScrollView(child: ConstrainedBox(
           child: Column(
             children: [
-              Column(children: [
-                _build_dow(),
-                _build_time(),
-                _build_routine(),
-                _build_chan(),
-                _build_value(),
-              ]),
+              Column(children: children),
               Padding(
                 child: big_button_adaptive(context,
                   'Save', Icons.check, _is_valid ? _on_save : null),

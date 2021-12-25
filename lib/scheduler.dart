@@ -37,19 +37,19 @@ class _SchedulerState extends State<Scheduler> {
 
           case 1:
           case 3:
-            job['_title_1'] = '${ROUTINE[job['routine']]} #${job['chan']+1}';
+            job['_title_1'] = ROUTINE[job['routine']];
             job['_title_2'] = '${job['value']} %';
             break;
 
           case 2:
             switch(board_pixtype(job['chan'])) {
               case 0:
-                job['_title_1'] = '${ROUTINE[job['routine']]} #${job['chan']+1}';
+                job['_title_1'] = ROUTINE[job['routine']];
                 job['_title_2'] = '${job['value']} \u00B0';
                 break;
 
               case 1:
-                job['_title_1'] = '${ROUTINE[4]} #${job['chan']+1}';
+                job['_title_1'] = ROUTINE[4];
                 job['_title_2'] = '${hue_to_temp(job['value'])} K';
                 break;
 
@@ -60,6 +60,10 @@ class _SchedulerState extends State<Scheduler> {
 
           default:
             job['_title_1'] = job['_title_2'] = '';
+        }
+
+        if(board_idv == 'SMA1' && job['routine'] > 0) {
+          job['_title_1'] += ' #${job['chan']+1}';
         }
 
         int days = 0;

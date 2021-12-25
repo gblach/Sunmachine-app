@@ -16,6 +16,7 @@ class Characteristic {
 
 late FlutterReactiveBle ble;
 late DiscoveredDevice ble_device;
+late String board_idv;
 late List<int> ble_control;
 late List<int> ble_strip;
 late List<int> ble_cronbuf;
@@ -101,24 +102,27 @@ int board_saturation(int chan, [int? value]) {
 }
 
 int board_timeout([int? value]) {
+  final int idx = ble_control.length - 3;
   if(value != null) {
-    return ble_control[3] = value;
+    return ble_control[idx] = value;
   }
-  return ble_control[3];
+  return ble_control[idx];
 }
 
 int board_light([int? value]) {
+  final int idx = ble_control.length - 2;
   if(value != null) {
-    return ble_control[4] = value;
+    return ble_control[idx] = value;
   }
-  return ble_control[4];
+  return ble_control[idx];
 }
 
 int board_speed([int? value]) {
+  final int idx = ble_control.length - 1;
   if(value != null) {
-    return ble_control[5] = value;
+    return ble_control[idx] = value;
   }
-  return ble_control[5];
+  return ble_control[idx];
 }
 
 int board_pixlen(int chan, [int? value]) {

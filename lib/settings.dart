@@ -34,20 +34,31 @@ class _SettingsState extends State<Settings> {
       _timeout = board_timeout();
       _light = board_light();
       _speed = board_speed();
-      _channel = [
-        board_channel(0),
-        board_channel(1),
-        board_channel(2),
-        board_channel(3),
-      ];
-      _pixlen_ctrl = [
-        TextEditingController(text: board_pixlen(2).toString()),
-        TextEditingController(text: board_pixlen(3).toString()),
-      ];
-      _pixtype = [
-        board_pixtype(2),
-        board_pixtype(3),
-      ];
+
+      switch(board_idv) {
+        case 'SMA1':
+          _channel = [
+            board_channel(0),
+            board_channel(1),
+            board_channel(2),
+            board_channel(3),
+          ];
+          _pixlen_ctrl = [
+            TextEditingController(text: board_pixlen(2).toString()),
+            TextEditingController(text: board_pixlen(3).toString()),
+          ];
+          _pixtype = [
+            board_pixtype(2),
+            board_pixtype(3),
+          ];
+          break;
+
+        case 'SMA2':
+          _channel = [ false, false, true ];
+          _pixlen_ctrl = [ TextEditingController(text: board_pixlen(2).toString()) ];
+          _pixtype = [ board_pixtype(2) ];
+          break;
+      }
     });
 
     _light_sub = ble.subscribeToCharacteristic(Characteristic.light_cur).listen((List<int> value) {
@@ -122,17 +133,30 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _build_body() {
-    return SingleChildScrollView(child: Column(children: [
+    List<Widget> children = [
       _build_rename(),
       _build_timeout(),
       _build_light(),
       _build_speed(),
       _build_scheduler(),
-      _build_chan_mono(0),
-      _build_chan_mono(1),
-      _build_chan_color(2),
-      _build_chan_color(3),
-    ]));
+    ];
+
+    switch(board_idv) {
+      case 'SMA1':
+        children.addAll([
+          _build_chan_mono(0),
+          _build_chan_mono(1),
+          _build_chan_color(2),
+          _build_chan_color(3),
+        ]);
+        break;
+
+      case 'SMA2':
+        children.add(_build_chan_color(2, false));
+        break;
+    }
+
+    return SingleChildScrollView(child: Column(children: children));
   }
 
   Widget _build_rename() {
@@ -268,23 +292,25 @@ class _SettingsState extends State<Settings> {
     ));
   }
 
-  Widget _build_chan_color(int chan) {
+  Widget _build_chan_color(int chan, [bool onoff=true]) {
     return card_unified(
       child: Column(children: [
-        CheckboxListTile(
+        onoff ? CheckboxListTile(
           title: Text('Channel ${chan+1}'),
           subtitle: Text('Enable or disable ${chan % 2 == 0 ? 'first' : 'second'} color channel.'),
           value: _channel[chan],
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onChanged: (bool? value) => _on_channel(chan, value!),
-        ),
+        ) : SizedBox(height: 12),
         Padding(
           child: Column(children: [
             Align(
               child: Text(
                 'Number of pixels',
-                style: Theme.of(context).textTheme.caption,
+                style: onoff
+                  ? Theme.of(context).textTheme.caption
+                  : Theme.of(context).textTheme.bodyText2,
               ),
               alignment: Alignment.centerLeft,
             ),

@@ -182,6 +182,8 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     setState(() => _conn_stage = ConnStage.discovering);
     await ble.requestMtu(deviceId: ble_device.id, mtu: 251);
     map_characteristics(await ble.discoverServices(ble_device.id));
+    final idv = await ble.readCharacteristic(Characteristic.idv);
+    board_idv = String.fromCharCodes(idv).replaceAll('\u0000', '');
 
     Navigator.pushNamed(context, '/device').whenComplete(() async {
       await _conn_sub.cancel();

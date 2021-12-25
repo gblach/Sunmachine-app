@@ -52,30 +52,40 @@ class _DeviceState extends State<Device> {
 
     setState(() {
       _mutex = false;
-
-      for(int chan=0; chan<4; chan++) {
-        if(board_channel(chan)) {
-          _channel = chan;
-          break;
-        }
-      }
-
       _mode = Mode.values[board_mode()];
       _mode_radio = _modes_radio.contains(_mode) ? Mode.on : Mode.auto;
-      _brightness = [
-        board_brightness(0),
-        board_brightness(1),
-        board_brightness(2),
-        board_brightness(3),
-      ];
-      _hue = [
-        board_hue(2),
-        board_hue(3),
-      ];
-      _saturation = [
-        board_saturation(2),
-        board_saturation(3),
-      ];
+
+      switch(board_idv) {
+        case 'SMA1':
+          for(int chan=0; chan<4; chan++) {
+            if(board_channel(chan)) {
+              _channel = chan;
+              break;
+            }
+          }
+          _brightness = [
+            board_brightness(0),
+            board_brightness(1),
+            board_brightness(2),
+            board_brightness(3),
+          ];
+          _hue = [
+            board_hue(2),
+            board_hue(3),
+          ];
+          _saturation = [
+            board_saturation(2),
+            board_saturation(3),
+          ];
+          break;
+
+        case 'SMA2':
+          _channel = 2;
+          _brightness = [ 0, 0, board_brightness(2) ];
+          _hue = [ board_hue(2) ];
+          _saturation = [ board_saturation(2) ];
+          break;
+      }
     });
   }
 
@@ -159,8 +169,12 @@ class _DeviceState extends State<Device> {
     List<Widget> children = [
       _build_switch(),
       _build_radio(),
-      _build_channels(),
     ];
+
+    switch(board_idv) {
+      case 'SMA1': children.add(_build_channels()); break;
+      case 'SMA2': children.add(SizedBox(height: 8)); break;
+    }
 
     switch(_channel) {
       case 0: children.add(_build_chan_mono(0)); break;
@@ -203,15 +217,15 @@ class _DeviceState extends State<Device> {
     switch(_mode) {
       case Mode.on:
       case Mode.off:
-        descr = 'Allows you to\u00A0manually turn the light on\u00A0or\u00A0off.';
+        descr = 'Allows you to manually turn the light on or off.';
         break;
 
       case Mode.auto:
-        descr = 'Uses sensors to\u00A0turn the\u00A0light on\u00A0or\u00A0off automatically.';
+        descr = 'Uses sensors to turn the light on or off automatically.';
         break;
 
       case Mode.sleep:
-        descr = 'Will switch to\u00A0automatic mode in\u00A0sunlight.';
+        descr = 'Will switch to automatic mode in sunlight.';
         break;
     }
 
