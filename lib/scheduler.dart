@@ -6,6 +6,8 @@ import 'bluetooth.dart';
 import 'widgets.dart';
 
 class Scheduler extends StatefulWidget {
+  const Scheduler({Key? key}) : super(key: key);
+
   @override
   _SchedulerState createState() => _SchedulerState();
 }
@@ -68,10 +70,12 @@ class _SchedulerState extends State<Scheduler> {
 
         int days = 0;
         String dow = '';
-        for(int j=0; j<7; j++) days += job['dow'] & pow(2, j) != 0 ? 1 : 0;
+        for(int j=0; j<7; j++) {
+          days += job['dow'] & pow(2, j) != 0 ? 1 : 0;
+        }
         for(int j=0; j<7; j++) {
           if(job['dow'] & pow(2, j) != 0) {
-            if(dow.length > 0) dow += ', ';
+            if(dow.isNotEmpty) dow += ', ';
             dow += days <= 3 ? DOW_LONG[j] : DOW_SHORT[j];
           }
         }
@@ -114,7 +118,7 @@ class _SchedulerState extends State<Scheduler> {
   }
 
   Widget _build_body() {
-    if(board_crontab.length == 0) return _build_new();
+    if(board_crontab.isEmpty) return _build_new();
     return _build_list();
   }
 
@@ -123,13 +127,13 @@ class _SchedulerState extends State<Scheduler> {
       children: [
         Padding(
           child: Image.asset('intro.png', fit: BoxFit.contain),
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
         Text(
           'No scheduled tasks found',
-          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18)
+          style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18)
         ),
-        Padding(
+        const Padding(
           child: Text(
             'You can schedule a change of operating mode, brightness, hue, saturation and/or temperature.',
             textAlign: TextAlign.center,
@@ -165,12 +169,10 @@ class _SchedulerState extends State<Scheduler> {
     return Dismissible(
       key: Key(job['_key']),
       child: card_unified_nopad(child: ListTile(
-        leading: Container(
-          child: Switch.adaptive(
-            value: job['enabled'] != 0,
-            activeColor: Theme.of(context).accentColor,
-            onChanged: (bool state) => _on_state(job['_key'], state),
-          ),
+        leading: Switch.adaptive(
+          value: job['enabled'] != 0,
+          activeColor: Theme.of(context).colorScheme.secondary,
+          onChanged: (bool state) => _on_state(job['_key'], state),
         ),
         title: RichText(
           text: TextSpan(
@@ -179,13 +181,13 @@ class _SchedulerState extends State<Scheduler> {
             children: <TextSpan>[
               TextSpan(
                 text: Platform.isIOS ? '  \u2192  ' : '  \u279E  ',
-                style: TextStyle(color: Colors.grey)),
+                style: const TextStyle(color: Colors.grey)),
               TextSpan(text: job['_title_2']),
             ],
           ),
         ),
         subtitle: Text(job['_subtitle'], textAlign: TextAlign.end),
-        contentPadding: EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 16),
+        contentPadding: const EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 16),
       )),
       direction: DismissDirection.endToStart,
       onDismissed: (DismissDirection direction) => _on_delete(job['_key']),

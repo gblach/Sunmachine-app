@@ -8,13 +8,15 @@ import 'widgets.dart';
 const List<String> PIXTYPE = [ 'RGB', 'WWA' ];
 
 class Settings extends StatefulWidget {
+  const Settings({Key? key}) : super(key: key);
+
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
   bool _mutex = true;
-  TextEditingController _name_ctrl = TextEditingController();
+  final TextEditingController _name_ctrl = TextEditingController();
   late int _timeout;
   late int _light;
   int _light_cur = 0;
@@ -24,6 +26,7 @@ class _SettingsState extends State<Settings> {
   late List<int> _pixtype;
   StreamSubscription<List<int>>? _light_sub;
 
+  @override
   void didChangeDependencies() async {
     final String name = Platform.isIOS ? ble_device.name
       : String.fromCharCodes(await ble.readCharacteristic(Characteristic.device_name));
@@ -64,6 +67,8 @@ class _SettingsState extends State<Settings> {
     _light_sub = ble.subscribeToCharacteristic(Characteristic.light_cur).listen((List<int> value) {
       if(value.isNotEmpty) setState(() => _light_cur = (value[0] | value[1] << 8));
     }, onError: print);
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -164,7 +169,7 @@ class _SettingsState extends State<Settings> {
       child: Column(children: [
         Row(
           children: [
-            Text('Rename'),
+            const Text('Rename'),
             Text(
               'Need device reconnect',
               style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
@@ -172,14 +177,14 @@ class _SettingsState extends State<Settings> {
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         text_field_adaptive(
           controller: _name_ctrl,
           max_length: 40,
           on_submitted: _on_rename,
         ),
       ]),
-      transarent: true,
+      transparent: true,
     );
   }
 
@@ -187,15 +192,15 @@ class _SettingsState extends State<Settings> {
     return card_unified(child: Column(children: [
       Row(
         children: [
-          Text('Turn off the light after'),
+          const Text('Turn off the light after'),
           Text(
             '${_timeout ~/ 12}:${(_timeout % 12 * 5).toString().padLeft(2, '0')} min',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Slider.adaptive(
         value: _timeout.toDouble(), min: 6, max: 120, divisions: 19,
         onChanged: (double value) => _on_timeout(value.toInt()),
@@ -208,21 +213,21 @@ class _SettingsState extends State<Settings> {
     return card_unified(child: Column(children: [
       Row(
         children: [
-          Text('Turn on the light when it\'s darker than'),
+          const Text('Turn on the light when it\'s darker than'),
           Text(
             '${_light * 5} lx',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Slider.adaptive(
         value: _light.toDouble(), min: 2, max: 50, divisions: 24,
         onChanged: (double value) => _on_ambient_light(value.toInt()),
         onChangeEnd: (double value) => _on_ambient_light_end(value.toInt()),
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Row(
         children: [
           Text(
@@ -230,8 +235,8 @@ class _SettingsState extends State<Settings> {
             style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
           ),
           Text(
-            '${_light_cur} lx',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            '$_light_cur lx',
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -243,15 +248,15 @@ class _SettingsState extends State<Settings> {
     return card_unified(child: Column(children: [
       Row(
         children: [
-          Text('Transition speed of the light'),
+          const Text('Transition speed of the light'),
           Text(
             _speed.toString(),
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Slider.adaptive(
         value: _speed.toDouble(), min: 1, max: 20, divisions: 20,
         onChanged: (double value) => _on_speed(value.toInt()),
@@ -265,16 +270,16 @@ class _SettingsState extends State<Settings> {
       child: ListTile(
         leading: Padding(
           child: icon_adaptive(Icons.schedule, CupertinoIcons.clock),
-          padding: EdgeInsets.only(top: 14, left: 8),
+          padding: const EdgeInsets.only(top: 14, left: 8),
         ),
-        title: Text('Scheduler'),
-        subtitle: Text('Schedule a change of mode, brightness, hue, saturation or temperature.'),
+        title: const Text('Scheduler'),
+        subtitle: const Text('Schedule a change of mode, brightness, hue, saturation or temperature.'),
         trailing: Padding(
           child: icon_adaptive(Icons.chevron_right, CupertinoIcons.right_chevron),
-          padding: EdgeInsets.only(top: 14),
+          padding: const EdgeInsets.only(top: 14),
         ),
         isThreeLine: true,
-        contentPadding: EdgeInsets.only(top: 4, left: 16, right: 16),
+        contentPadding: const EdgeInsets.only(top: 4, left: 16, right: 16),
         onTap: _goto_scheduler,
       ),
       iconColor: Theme.of(context).iconTheme.color,
@@ -287,7 +292,7 @@ class _SettingsState extends State<Settings> {
       subtitle: Text('Enable or disable ${chan % 2 == 0 ? 'first' : 'second'} mono channel.'),
       value: _channel[chan],
       controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       onChanged: (bool? value) => _on_channel(chan, value!),
     ));
   }
@@ -300,9 +305,9 @@ class _SettingsState extends State<Settings> {
           subtitle: Text('Enable or disable ${chan % 2 == 0 ? 'first' : 'second'} color channel.'),
           value: _channel[chan],
           controlAffinity: ListTileControlAffinity.leading,
-          contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onChanged: (bool? value) => _on_channel(chan, value!),
-        ) : SizedBox(height: 12),
+        ) : const SizedBox(height: 12),
         Padding(
           child: Column(children: [
             Align(
@@ -322,7 +327,7 @@ class _SettingsState extends State<Settings> {
                 numpad: true,
                 on_submitted: (String value) => _on_pixlen(chan, value),
               )),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               DropdownButton(
                 value: PIXTYPE[_pixtype[chan-2]],
                 items: PIXTYPE.map((String value) {
@@ -335,7 +340,7 @@ class _SettingsState extends State<Settings> {
             ]),
             SizedBox(height: _channel[chan] ? 0 : 6),
           ]),
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
       ]),
       top: 0, bottom: 16, left: 0, right: 0,

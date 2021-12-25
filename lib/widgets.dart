@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 const List<String> ROUTINE = [ 'Mode', 'Brightness', 'Hue', 'Saturation', 'Temperature' ];
 const List<String> MODE = [ 'Off', 'On', 'Sleep', 'Auto' ];
 const List<String> DOW_LONG = [
-  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturnday'
+  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 ];
 const List<String> DOW_SHORT = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 
 ThemeData app_theme() {
   return ThemeData(
     brightness: Brightness.light,
-    primarySwatch: MaterialColor(0xff2962ff, {
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: const MaterialColor(0xff2962ff, {
       50: Color(0xffe7e9ff),
       100: Color(0xffc2c8fe),
       200: Color(0xff96a4fe),
@@ -23,9 +23,11 @@ ThemeData app_theme() {
       700: Color(0xff002fe3),
       800: Color(0xff0022d9),
       900: Color(0xff0001c0),
-    }),
-    accentColor: Color(0xff2962ff),
-    toggleableActiveColor: Color(0xff2962ff),
+    })).copyWith(
+      primary: const Color(0xff2962ff),
+      secondary: const Color(0xff2962ff),
+    ),
+    toggleableActiveColor: const Color(0xff2962ff),
     unselectedWidgetColor: Colors.grey[600],
     dividerColor: Colors.grey[400],
     scaffoldBackgroundColor: Colors.grey[200],
@@ -34,15 +36,15 @@ ThemeData app_theme() {
       subtitle1: TextStyle(color: Colors.grey[800]),
       caption: TextStyle(color: Colors.grey[600]),
       overline: TextStyle(color: Colors.grey[400]),
-      button: TextStyle(color: Colors.white),
+      button: const TextStyle(color: Colors.white),
     ),
     hintColor: Colors.grey[600],
-    iconTheme: IconThemeData(color: Colors.grey),
-    inputDecorationTheme: InputDecorationTheme(isDense: true),
-    bottomSheetTheme: BottomSheetThemeData(
+    iconTheme: const IconThemeData(color: Colors.grey),
+    inputDecorationTheme: const InputDecorationTheme(isDense: true),
+    bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: Colors.white,
     ),
-    cupertinoOverrideTheme: CupertinoThemeData(
+    cupertinoOverrideTheme: const CupertinoThemeData(
       brightness: Brightness.light,
     ),
   );
@@ -53,15 +55,15 @@ Widget loader(String title, [String? subtitle]) {
     child: Padding(
       child: ListTile(
         leading: Platform.isIOS
-          ? CupertinoActivityIndicator(radius: 20)
-          : CircularProgressIndicator(),
+          ? const CupertinoActivityIndicator(radius: 20)
+          : const CircularProgressIndicator(),
         title: Text(title),
         subtitle: Text(subtitle ?? 'Wait a while'),
       ),
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
     ),
-    margin: EdgeInsets.only(bottom: 80),
-    shape: RoundedRectangleBorder(),
+    margin: const EdgeInsets.only(bottom: 80),
+    shape: const RoundedRectangleBorder(),
   ));
 }
 
@@ -71,30 +73,30 @@ Widget card_unified({
   double bottom=12,
   double left=16,
   double right=16,
-  bool transarent=false,
+  bool transparent=false,
 }) {
   final Padding inner_card = Padding(
     child: child,
     padding: EdgeInsets.only(top: top, bottom: bottom, left: left, right: right),
   );
 
-  if(! transarent) {
+  if(! transparent) {
     return Card(
       child: inner_card,
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
     );
   } else {
     return Card(
       child: inner_card,
       color: Colors.transparent,
       elevation: 0,
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
     );
   }
 }
 
-Widget card_unified_nopad({required Widget child, bool transarent=false}) {
-  return card_unified(child: child, top: 0, bottom: 0, left: 0, right: 0, transarent: transarent);
+Widget card_unified_nopad({required Widget child, bool transparent=false}) {
+  return card_unified(child: child, top: 0, bottom: 0, left: 0, right: 0, transparent: transparent);
 }
 
 Widget icon_adaptive(IconData material_icon, IconData cupertino_icon, {Color? color}) {
@@ -120,7 +122,7 @@ Widget text_field_adaptive({
       autofocus: autofocus,
       obscureText: obscure_text,
       keyboardType: numpad ? TextInputType.number : null,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       onSubmitted: on_submitted,
     );
   } else {
@@ -142,14 +144,12 @@ void time_picker_adaptive(BuildContext context, TimeOfDay initial, ValueChanged<
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           child: CupertinoTimerPicker(
-            initialTimerDuration: initial != null
-              ? Duration(hours: initial.hour, minutes: initial.minute)
-              : Duration.zero,
+            initialTimerDuration: Duration(hours: initial.hour, minutes: initial.minute),
             mode: CupertinoTimerPickerMode.hm,
             onTimerDurationChanged: (Duration timer) {
-              if(on_changed != null) on_changed(TimeOfDay(hour: timer.inHours, minute: timer.inMinutes % 60));
+              on_changed(TimeOfDay(hour: timer.inHours, minute: timer.inMinutes % 60));
             },
             backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
           ),
@@ -157,10 +157,10 @@ void time_picker_adaptive(BuildContext context, TimeOfDay initial, ValueChanged<
         );
       }
     );
-    if(on_changed != null) on_changed(initial);
+    on_changed(initial);
   } else {
     TimeOfDay? time = await showTimePicker(context: context, initialTime: initial);
-    if(on_changed != null && time != null) on_changed(time);
+    if(time != null) on_changed(time);
   }
 }
 
@@ -168,7 +168,7 @@ Widget big_button_adaptive(BuildContext context, String label, IconData icon, Va
   if(Platform.isIOS) {
     return CupertinoButton(
       child: Text(label),
-      color: Theme.of(context).accentColor,
+      color: Theme.of(context).colorScheme.secondary,
       disabledColor: Theme.of(context).disabledColor,
       minSize: 48,
       onPressed: on_tap,
@@ -179,12 +179,12 @@ Widget big_button_adaptive(BuildContext context, String label, IconData icon, Va
         label: Text(label),
         icon: Icon(icon),
         style: ElevatedButton.styleFrom(
-          minimumSize: Size(double.infinity, 48),
-          textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          minimumSize: const Size(double.infinity, 48),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         onPressed: on_tap,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 }
@@ -207,7 +207,7 @@ void bottom_sheet_adaptive(BuildContext context, List<Map> values, ValueSetter o
             );
           }),
           cancelButton: CupertinoActionSheetAction(
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
             onPressed: () => Navigator.pop(context),
           ),
         );
@@ -240,22 +240,22 @@ Widget _gradient(List<Color> colors) {
   return Container(
     decoration: BoxDecoration(
       gradient: LinearGradient(colors: colors),
-      borderRadius: BorderRadius.all(Radius.circular(4)),
+      borderRadius: const BorderRadius.all(Radius.circular(4)),
     ),
     height: 8,
-    margin: EdgeInsets.symmetric(horizontal: 24),
+    margin: const EdgeInsets.symmetric(horizontal: 24),
   );
 }
 
 Widget gradient_hue() {
   return _gradient([
-    HSVColor.fromAHSV(1, 0, 1, 1).toColor(),
-    HSVColor.fromAHSV(1, 60, 1, 1).toColor(),
-    HSVColor.fromAHSV(1, 120, 1, 1).toColor(),
-    HSVColor.fromAHSV(1, 180, 1, 1).toColor(),
-    HSVColor.fromAHSV(1, 240, 1, 1).toColor(),
-    HSVColor.fromAHSV(1, 300, 1, 1).toColor(),
-    HSVColor.fromAHSV(1, 360, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 0, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 60, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 120, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 180, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 240, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 300, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 360, 1, 1).toColor(),
   ]);
 }
 
@@ -269,11 +269,11 @@ Widget gradient_saturation(int hue) {
 
 Widget gradient_temperature() {
   return _gradient([
-    HSVColor.fromAHSV(1, 210, 0.3, 1).toColor(),
-    HSVColor.fromAHSV(1, 0, 0.0, 0.98).toColor(),
-    HSVColor.fromAHSV(1, 60, 0.3, 1).toColor(),
-    HSVColor.fromAHSV(1, 55, 0.7, 1).toColor(),
-    HSVColor.fromAHSV(1, 30, 1, 1).toColor(),
+    const HSVColor.fromAHSV(1, 210, 0.3, 1).toColor(),
+    const HSVColor.fromAHSV(1, 0, 0.0, 0.98).toColor(),
+    const HSVColor.fromAHSV(1, 60, 0.3, 1).toColor(),
+    const HSVColor.fromAHSV(1, 55, 0.7, 1).toColor(),
+    const HSVColor.fromAHSV(1, 30, 1, 1).toColor(),
   ]);
 }
 

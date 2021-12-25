@@ -21,7 +21,7 @@ late List<int> ble_control;
 late List<int> ble_strip;
 late List<int> ble_cronbuf;
 late List<Map<String,dynamic>> board_crontab;
-final int board_crontab_size = 10;
+const int board_crontab_size = 10;
 
 void map_characteristics(List<DiscoveredService> services) {
   for(final DiscoveredService s in services) {

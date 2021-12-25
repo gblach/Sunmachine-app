@@ -11,6 +11,8 @@ import 'widgets.dart';
 enum Mode { off, on, sleep, auto }
 
 class Device extends StatefulWidget {
+  const Device({Key? key}) : super(key: key);
+
   @override
   _DeviceState createState() => _DeviceState();
 }
@@ -173,7 +175,7 @@ class _DeviceState extends State<Device> {
 
     switch(board_idv) {
       case 'SMA1': children.add(_build_channels()); break;
-      case 'SMA2': children.add(SizedBox(height: 8)); break;
+      case 'SMA2': children.add(const SizedBox(height: 8)); break;
     }
 
     switch(_channel) {
@@ -191,7 +193,7 @@ class _DeviceState extends State<Device> {
 
   Widget _build_switch() {
     return Column(children: [
-      Padding(
+      const Padding(
         child: Align(
           child: Text('Enable / Disable'),
           alignment: Alignment.centerLeft,
@@ -202,12 +204,12 @@ class _DeviceState extends State<Device> {
         child: Transform.scale(
           child: Switch.adaptive(
             value: _modes_switch.contains(_mode),
-            activeColor: Theme.of(context).accentColor,
+            activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: _on_mode_switch,
           ),
           scale: Platform.isIOS ? 1.5 : 2.5,
         ),
-        padding: EdgeInsets.only(top: 16, bottom: 32),
+        padding: const EdgeInsets.only(top: 16, bottom: 32),
       ),
     ]);
   }
@@ -231,36 +233,36 @@ class _DeviceState extends State<Device> {
 
     return card_unified(
       child: Column(children: [
-        Align(
+        const Align(
           child: Text('Choose operating mode'),
           alignment: Alignment.centerLeft,
         ),
         Container(
           child: Column(children: [
             RadioListTile(
-              title: Text('Auto'),
+              title: const Text('Auto'),
               value: Mode.auto,
               groupValue: _mode_radio,
               onChanged: _on_mode_radio,
             ),
             RadioListTile(
-              title: Text('Manual'),
+              title: const Text('Manual'),
               value: Mode.on,
               groupValue: _mode_radio,
               onChanged: _on_mode_radio,
             ),
           ]),
           width: 160,
-          padding: EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        Divider(height: 0),
+        const Divider(height: 0),
         Container(
           child: Text(descr, textAlign: TextAlign.center, style: TextStyle(
             color: Theme.of(context).textTheme.caption!.color,
             height: 1.2,
           )),
           height: 40,
-          padding: EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.only(top: 6),
         ),
       ]),
     );
@@ -278,7 +280,7 @@ class _DeviceState extends State<Device> {
             primary: _channel == chan
               ? Theme.of(context).toggleableActiveColor
               : Theme.of(context).unselectedWidgetColor,
-            padding: EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
           ),
           onPressed: () => _on_channel(chan),
         ));
@@ -305,12 +307,12 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text(
             '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Slider.adaptive(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
         onChanged: (double value) => _on_brightness(chan, value.toInt()),
@@ -330,24 +332,24 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text(
             '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Slider.adaptive(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
         onChanged: (double value) => _on_brightness(chan, value.toInt()),
         onChangeEnd: (double value) => _on_brightness_end(chan, value.toInt()),
       ),
-      Divider(height: 24),
+      const Divider(height: 24),
       Row(
         children: [
           Text(ROUTINE[2]),
           Text(
             '${_hue[chan-2]} \u00B0',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -358,14 +360,14 @@ class _DeviceState extends State<Device> {
         onChangeEnd: (double value) => _on_hue_end(chan, value.toInt()),
       ),
       gradient_hue(),
-      SizedBox(height: 6),
-      Divider(height: 24),
+      const SizedBox(height: 6),
+      const Divider(height: 24),
       Row(
         children: [
           Text(ROUTINE[3]),
           Text(
             '${_saturation[chan-2]} %',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -376,7 +378,7 @@ class _DeviceState extends State<Device> {
         onChangeEnd: (value) => _on_saturation_end(chan, value.toInt()),
       ),
       gradient_saturation(_hue[chan-2]),
-      SizedBox(height: 12),
+      const SizedBox(height: 12),
     ]));
   }
 
@@ -387,24 +389,24 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text(
             '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      SizedBox(height: 6),
+      const SizedBox(height: 6),
       Slider.adaptive(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
         onChanged: (double value) => _on_brightness(chan, value.toInt()),
         onChangeEnd: (double value) => _on_brightness_end(chan, value.toInt()),
       ),
-      Divider(height: 24),
+      const Divider(height: 24),
       Row(
         children: [
           Text(ROUTINE[4]),
           Text(
             '${hue_to_temp(_hue[chan-2])} K',
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -415,7 +417,7 @@ class _DeviceState extends State<Device> {
         onChangeEnd: (double value) => _on_hue_end(chan, value.toInt()),
       ),
       gradient_temperature(),
-      SizedBox(height: 12),
+      const SizedBox(height: 12),
     ]));
   }
 }

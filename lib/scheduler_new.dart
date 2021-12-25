@@ -6,13 +6,15 @@ import 'dow_picker.dart';
 import 'widgets.dart';
 
 class SchedulerNew extends StatefulWidget {
+  const SchedulerNew({Key? key}) : super(key: key);
+
   @override
   _SchedulerNewState createState() => _SchedulerNewState();
 }
 
 class _SchedulerNewState extends State<SchedulerNew> {
   bool _is_valid = false;
-  List<bool> _dow_ctrl = DowPicker.init();
+  final List<bool> _dow_ctrl = DowPicker.init();
   TimeOfDay? _time;
   int? _routine;
   int? _chan = 2;
@@ -24,8 +26,8 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   void _on_time() {
-    TimeOfDay? time = _time != null ? _time : TimeOfDay.now();
-    time_picker_adaptive(context, time!, (TimeOfDay time) {
+    TimeOfDay? time = _time ?? TimeOfDay.now();
+    time_picker_adaptive(context, time, (TimeOfDay time) {
       _time = time;
       _validate();
     });
@@ -53,7 +55,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
       }
     }
 
-    if(_routine == 0 || channels.length == 0) _chan = null;
+    if(_routine == 0 || channels.isEmpty) _chan = null;
     else if(channels.length == 1) _chan = channels[0]['value'];
     else if(_chan != null) {
       switch(_routine) {
@@ -246,7 +248,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
               Padding(
                 child: big_button_adaptive(context,
                   'Save', Icons.check, _is_valid ? _on_save : null),
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
               ),
             ],
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -263,14 +265,14 @@ class _SchedulerNewState extends State<SchedulerNew> {
     for(int i=0; i<_dow_ctrl.length; i++) days += _dow_ctrl[i] ? 1 : 0;
     for(int i=0; i<_dow_ctrl.length; i++) {
       if(_dow_ctrl[i]) {
-        if(dow.length > 0) dow += ', ';
+        if(dow.isNotEmpty) dow += ', ';
         dow += days <= 3 ? DOW_LONG[i] : DOW_SHORT[i];
       }
     }
 
     return card_unified_nopad(child: ListTile(
       title: Text(dow),
-      subtitle: Text('days of week'),
+      subtitle: const Text('days of week'),
       onTap: _on_dow,
     ));
   }
@@ -280,7 +282,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
       title: Text(_time != null
         ? '${_time!.hour}:${_time!.minute.toString().padLeft(2, '0')}'
         : ''),
-      subtitle: Text('time'),
+      subtitle: const Text('time'),
       onTap: _on_time,
     ));
   }
@@ -288,17 +290,17 @@ class _SchedulerNewState extends State<SchedulerNew> {
   Widget _build_routine() {
     return card_unified_nopad(child: ListTile(
       title: Text(_routine != null ? ROUTINE[_routine!] : ''),
-      subtitle: Text('routine'),
+      subtitle: const Text('routine'),
       onTap: _on_routine,
     ));
   }
 
   Widget _build_chan() {
-    if(_routine == null || _routine == 0) return SizedBox();
+    if(_routine == null || _routine == 0) return const SizedBox();
 
     return card_unified_nopad(child: ListTile(
       title: Text(_chan != null ? 'Channel #${_chan!+1}' : ''),
-      subtitle: Text('channel'),
+      subtitle: const Text('channel'),
       onTap: _on_chan,
     ));
   }
@@ -310,14 +312,14 @@ class _SchedulerNewState extends State<SchedulerNew> {
       case 2: return _build_hue();
       case 3: return _build_saturation();
       case 4: return _build_temperature();
-      default: return SizedBox();
+      default: return const SizedBox();
     }
   }
 
   Widget _build_mode() {
     return card_unified_nopad(child: ListTile(
       title: Text(_value != null ? MODE[_value!.toInt()] : ''),
-      subtitle: Text('mode'),
+      subtitle: const Text('mode'),
       onTap: _on_mode,
     ));
   }
@@ -337,8 +339,8 @@ class _SchedulerNewState extends State<SchedulerNew> {
               style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
-              '${_value} %',
-              style: TextStyle(color: Theme.of(context).accentColor)
+              '$_value %',
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -356,7 +358,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
           onChanged: _on_value, onChangeEnd: (double value) => _validate(),
         ),
         gradient_hue(),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           children: [
             Text(
@@ -364,8 +366,8 @@ class _SchedulerNewState extends State<SchedulerNew> {
               style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
-              '${_value} \u00B0',
-              style: TextStyle(color: Theme.of(context).accentColor)
+              '$_value \u00B0',
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -383,7 +385,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
           onChanged: _on_value, onChangeEnd: (double value) => _validate(),
         ),
         gradient_saturation(_chan != null ? board_hue(_chan!) : 224),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           children: [
             Text(
@@ -391,8 +393,8 @@ class _SchedulerNewState extends State<SchedulerNew> {
               style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
             ),
             Text(
-              '${_value} %',
-              style: TextStyle(color: Theme.of(context).accentColor)
+              '$_value %',
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -410,7 +412,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
           onChanged: _on_value, onChangeEnd: (double value) => _validate(),
         ),
         gradient_temperature(),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           children: [
             Text(
@@ -419,7 +421,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
             ),
             Text(
               '${hue_to_temp(_value!)} K',
-              style: TextStyle(color: Theme.of(context).accentColor)
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

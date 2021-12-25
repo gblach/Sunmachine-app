@@ -21,19 +21,21 @@ class DeviceTime {
   DeviceTime(this.device, this.time);
 }
 
-void main() => runApp(App());
+void main() => runApp(const App());
 
 class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sunmachine',
-      home: Main(),
+      home: const Main(),
       routes: {
-        '/device': (BuildContext context) => Device(),
-        '/settings': (BuildContext context) => Settings(),
-        '/scheduler': (BuildContext context) => Scheduler(),
-        '/scheduler/new': (BuildContext context) => SchedulerNew(),
+        '/device': (BuildContext context) => const Device(),
+        '/settings': (BuildContext context) => const Settings(),
+        '/scheduler': (BuildContext context) => const Scheduler(),
+        '/scheduler/new': (BuildContext context) => const SchedulerNew(),
       },
       theme: app_theme(),
     );
@@ -41,13 +43,15 @@ class App extends StatelessWidget {
 }
 
 class Main extends StatefulWidget {
+  const Main({Key? key}) : super(key: key);
+
   @override
   _MainState createState() => _MainState();
 }
 
 class _MainState extends State<Main> with WidgetsBindingObserver {
-  static const platform = const MethodChannel('pl.blach.sunmachine/native');
-  List<DeviceTime> _devices = [];
+  static const platform = MethodChannel('pl.blach.sunmachine/native');
+  final List<DeviceTime> _devices = [];
   ConnStage? _conn_stage;
   StreamSubscription<DiscoveredDevice>? _scan_sub;
   late StreamSubscription<void> _conn_sub;
@@ -121,7 +125,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
 
   void _start_scan() {
     if(Platform.isAndroid) {
-      _cleanup_timer = Timer.periodic(Duration(seconds: 1), _cleanup);
+      _cleanup_timer = Timer.periodic(const Duration(seconds: 1), _cleanup);
     }
 
     _scan_sub = ble.scanForDevices(withServices: [service_uuid])
@@ -139,7 +143,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   void _cleanup(Timer timer) {
-    DateTime limit = DateTime.now().subtract(Duration(seconds: 5));
+    DateTime limit = DateTime.now().subtract(const Duration(seconds: 5));
     for(int i=_devices.length-1; i>=0; i--) {
       if(_devices[i].time.isBefore(limit)) setState(() => _devices.removeAt(i));
     }
@@ -200,7 +204,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sunmachine'),
+        title: const Text('Sunmachine'),
         actions: [IconButton(
           icon: icon_adaptive(Icons.refresh, CupertinoIcons.refresh),
           onPressed: _conn_stage == null ? _restart_scan : null,
@@ -228,13 +232,13 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       children: [
         Padding(
           child: Image.asset('intro.png', fit: BoxFit.contain),
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
         Text(
           'No light sources found',
-          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+          style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
         ),
-        Text(
+        const Text(
           'Wait while looking for light sources.\nThis should take a few seconds.',
           textAlign: TextAlign.center,
           style: TextStyle(height: 1.5),
@@ -263,13 +267,13 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
               ),
               alignment: Alignment.centerLeft,
             ),
-            color: Theme.of(context).primaryColor,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            color: Theme.of(context).colorScheme.primary,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           Expanded(child: ListView.separated(
             itemCount: _devices.length,
             itemBuilder: _build_list_item,
-            separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
+            separatorBuilder: (BuildContext context, int index) => const Divider(height: 0),
           )),
         ]),
       ]),
@@ -284,13 +288,13 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
           leading: icon_adaptive(Icons.lightbulb_outline, CupertinoIcons.lightbulb),
           title: Text(_devices[index].device.name),
           trailing: icon_adaptive(Icons.chevron_right, CupertinoIcons.chevron_right),
-          contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onTap: () => _goto_device(index),
         ),
         iconColor: Theme.of(context).iconTheme.color,
       ),
-      margin: EdgeInsets.all(0),
-      shape: RoundedRectangleBorder(),
+      margin: const EdgeInsets.all(0),
+      shape: const RoundedRectangleBorder(),
     );
   }
 }

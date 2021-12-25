@@ -65,7 +65,7 @@ void dow_picker_adaptive(BuildContext context, String title, DowPicker dow_picke
             elevation: 0,
           ),
           actions: [CupertinoDialogAction(
-            child: Text('OK'),
+            child: const Text('OK'),
             onPressed: () {
               Navigator.pop(context);
               on_tap();
@@ -77,7 +77,7 @@ void dow_picker_adaptive(BuildContext context, String title, DowPicker dow_picke
           title: Text(title.toUpperCase(), style: Theme.of(context).textTheme.overline),
           content: dow_picker,
           actions: [TextButton(
-            child: Text('OK'),
+            child: const Text('OK'),
             onPressed: () {
               Navigator.pop(context);
               on_tap();
