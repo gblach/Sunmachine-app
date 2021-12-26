@@ -176,10 +176,7 @@ class _DeviceState extends State<Device> {
       _build_radio(),
     ];
 
-    switch(board_idv) {
-      case 'SMA1': children.add(_build_channels()); break;
-      case 'SMA2': children.add(const SizedBox(height: 8)); break;
-    }
+    if(board_idv == 'SMA1') children.add(_build_channels());
 
     switch(_channel) {
       case 0: children.add(_build_chan_mono(0)); break;
@@ -188,10 +185,17 @@ class _DeviceState extends State<Device> {
       case 3: children.add(_build_chan_color(3)); break;
     }
 
-    return SingleChildScrollView(child: Column(
-      children: children,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    ));
+    return LayoutBuilder(builder: (context, constraint) {
+      return SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraint.maxHeight),
+          child: Column(
+            children: children,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+        ),
+      );
+    });
   }
 
   Widget _build_switch() {
