@@ -24,9 +24,9 @@ ThemeData app_theme() {
       800: Color(0xff0022d9),
       900: Color(0xff0001c0),
     })).copyWith(
-      primary: const Color(0xff2962ff),
       secondary: const Color(0xff2962ff),
     ),
+    primaryColor: const Color(0xff2962ff),
     toggleableActiveColor: const Color(0xff2962ff),
     unselectedWidgetColor: Colors.grey[600],
     dividerColor: Colors.grey[400],

@@ -267,7 +267,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
               ),
               alignment: Alignment.centerLeft,
             ),
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).primaryColor,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           Expanded(child: ListView.separated(
