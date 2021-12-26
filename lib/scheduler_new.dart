@@ -17,7 +17,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   final List<bool> _dow_ctrl = DowPicker.init();
   TimeOfDay? _time;
   int? _routine;
-  int? _chan = 2;
+  int? _chan;
   int? _value;
 
   void _on_dow() {
@@ -116,6 +116,8 @@ class _SchedulerNewState extends State<SchedulerNew> {
       _routine = value;
       if(board_idv == 'SMA1') {
         _channels();
+      } else {
+        _chan = 2;
       }
       _value_default();
       _validate();
@@ -205,7 +207,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
         'hh': _time!.hour,
         'mm': _time!.minute,
         'routine': _routine! < 4 ? _routine : 2,
-        'chan': _routine! > 0 ? _chan : 0,
+        'chan': (board_idv == 'SMA1' && _routine! > 0) ? _chan : 0,
         'value': _value,
       });
       board_crontab_to_cronbuf();

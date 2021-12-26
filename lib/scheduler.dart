@@ -16,7 +16,7 @@ class _SchedulerState extends State<Scheduler> {
   bool _mutex = true;
 
   @override
-  void initState() async {
+  void initState() {
     initAsync();
     super.initState();
   }
@@ -48,7 +48,7 @@ class _SchedulerState extends State<Scheduler> {
             break;
 
           case 2:
-            switch(board_pixtype(job['chan'])) {
+            switch(board_pixtype(board_idv == 'SMA1' ? job['chan'] : 2)) {
               case 0:
                 job['_title_1'] = ROUTINE[job['routine']];
                 job['_title_2'] = '${job['value']} \u00B0';
