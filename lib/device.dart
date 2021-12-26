@@ -186,15 +186,13 @@ class _DeviceState extends State<Device> {
     }
 
     return LayoutBuilder(builder: (context, constraint) {
-      return SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraint.maxHeight),
-          child: Column(
-            children: children,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          ),
+      return SingleChildScrollView(child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: constraint.maxHeight),
+        child: Column(
+          children: children,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
         ),
-      );
+      ));
     });
   }
 
