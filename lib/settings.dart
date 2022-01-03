@@ -206,8 +206,8 @@ class _SettingsState extends State<Settings> {
       const SizedBox(height: 6),
       Slider.adaptive(
         value: _timeout.toDouble(), min: 6, max: 120, divisions: 19,
-        onChanged: (double value) => _on_timeout(value.toInt()),
-        onChangeEnd:(double value) =>  _on_timeout_end(value.toInt()),
+        onChanged: (double value) => _on_timeout(value.round()),
+        onChangeEnd:(double value) =>  _on_timeout_end(value.round()),
       ),
     ]));
   }
@@ -226,9 +226,9 @@ class _SettingsState extends State<Settings> {
       ),
       const SizedBox(height: 6),
       Slider.adaptive(
-        value: _light.toDouble(), min: 2, max: 50, divisions: 24,
-        onChanged: (double value) => _on_ambient_light(value.toInt()),
-        onChangeEnd: (double value) => _on_ambient_light_end(value.toInt()),
+        value: _light.toDouble(), min: 1, max: 20, divisions: 20,
+        onChanged: (double value) => _on_ambient_light(value.round()),
+        onChangeEnd: (double value) => _on_ambient_light_end(value.round()),
       ),
       const SizedBox(height: 6),
       Row(
@@ -262,8 +262,8 @@ class _SettingsState extends State<Settings> {
       const SizedBox(height: 6),
       Slider.adaptive(
         value: _speed.toDouble(), min: 1, max: 20, divisions: 20,
-        onChanged: (double value) => _on_speed(value.toInt()),
-        onChangeEnd: (double value) => _on_speed_end(value.toInt()),
+        onChanged: (double value) => _on_speed(value.round()),
+        onChangeEnd: (double value) => _on_speed_end(value.round()),
       ),
     ]));
   }

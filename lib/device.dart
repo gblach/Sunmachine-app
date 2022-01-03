@@ -320,8 +320,8 @@ class _DeviceState extends State<Device> {
       const SizedBox(height: 6),
       Slider.adaptive(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
-        onChanged: (double value) => _on_brightness(chan, value.toInt()),
-        onChangeEnd: (double value) => _on_brightness_end(chan, value.toInt()),
+        onChanged: (double value) => _on_brightness(chan, value.round()),
+        onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
       ),
     ]));
   }
@@ -345,8 +345,8 @@ class _DeviceState extends State<Device> {
       const SizedBox(height: 6),
       Slider.adaptive(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
-        onChanged: (double value) => _on_brightness(chan, value.toInt()),
-        onChangeEnd: (double value) => _on_brightness_end(chan, value.toInt()),
+        onChanged: (double value) => _on_brightness(chan, value.round()),
+        onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
       ),
       const Divider(height: 24),
       Row(
@@ -361,8 +361,8 @@ class _DeviceState extends State<Device> {
       ),
       Slider.adaptive(
         value: _hue[chan-2].toDouble(), min: 0, max: 360, divisions: 180,
-        onChanged: (double value) => _on_hue(chan, value.toInt()),
-        onChangeEnd: (double value) => _on_hue_end(chan, value.toInt()),
+        onChanged: (double value) => _on_hue(chan, value.round()),
+        onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
       ),
       gradient_hue(),
       const SizedBox(height: 6),
@@ -379,8 +379,8 @@ class _DeviceState extends State<Device> {
       ),
       Slider.adaptive(
         value: _saturation[chan-2].toDouble(), min: 0, max: 100, divisions: 100,
-        onChanged: (value) => _on_saturation(chan, value.toInt()),
-        onChangeEnd: (value) => _on_saturation_end(chan, value.toInt()),
+        onChanged: (value) => _on_saturation(chan, value.round()),
+        onChangeEnd: (value) => _on_saturation_end(chan, value.round()),
       ),
       gradient_saturation(_hue[chan-2]),
       const SizedBox(height: 12),
@@ -402,8 +402,8 @@ class _DeviceState extends State<Device> {
       const SizedBox(height: 6),
       Slider.adaptive(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
-        onChanged: (double value) => _on_brightness(chan, value.toInt()),
-        onChangeEnd: (double value) => _on_brightness_end(chan, value.toInt()),
+        onChanged: (double value) => _on_brightness(chan, value.round()),
+        onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
       ),
       const Divider(height: 24),
       Row(
@@ -418,8 +418,8 @@ class _DeviceState extends State<Device> {
       ),
       Slider.adaptive(
         value: _hue[chan-2].toDouble(), min: 120, max: 360, divisions: 120,
-        onChanged: (double value) => _on_hue(chan, value.toInt()),
-        onChangeEnd: (double value) => _on_hue_end(chan, value.toInt()),
+        onChanged: (double value) => _on_hue(chan, value.round()),
+        onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
       ),
       gradient_temperature(),
       const SizedBox(height: 12),
