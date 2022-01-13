@@ -149,7 +149,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   void _on_value(double value) {
-    setState(() => _value = value.toInt());
+    setState(() => _value = value.round());
   }
 
   void _validate() {
