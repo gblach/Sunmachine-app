@@ -62,6 +62,12 @@ flutter {
     source '../..'
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.android.gms:play-services-location:19.0.1'
+    }
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation 'junit:junit:4.13.1'
