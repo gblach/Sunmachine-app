@@ -3,7 +3,7 @@
 import os, glob, re, json, shutil
 
 os.system('wget https://ftp.iana.org/tz/tzdb-latest.tar.lz')
-os.system('tar xvf tzdb-latest.tar.lz')
+os.system('bsdtar xvf tzdb-latest.tar.lz')
 
 dirname = glob.glob('tzdb-20*')[0]
 os.system("make -C %s install DESTDIR=../tzdb-root" % dirname)
