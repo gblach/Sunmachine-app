@@ -174,7 +174,7 @@ class _SettingsState extends State<Settings> {
           children: [
             const Text('Rename'),
             Text(
-              'Need device reconnect',
+              'Need device restart',
               style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
             ),
           ],
