@@ -11,7 +11,7 @@ class DowPicker extends StatefulWidget {
     required this.ctrl,
   }) : super(key: key);
 
-  static init() => [false, false, false, false, false, false, false];
+  static init() => [true, true, true, true, true, true, true];
 
   @override
   _DowPickerState createState() => _DowPickerState();
