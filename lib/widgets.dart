@@ -9,43 +9,28 @@ const List<String> DOW_LONG = [
 ];
 const List<String> DOW_SHORT = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 
-ThemeData app_theme() {
+ThemeData app_theme(Brightness brightness) {
+  final bool is_light = brightness == Brightness.light;
+
+  final scheme = ColorScheme.fromSeed(
+    brightness: brightness,
+    seedColor: const Color(0xff2962ff),
+  ).copyWith(
+    primary: is_light ? const Color(0xff2962ff) : null,
+  );
+
   return ThemeData(
-    brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: const MaterialColor(0xff2962ff, {
-      50: Color(0xffe7e9ff),
-      100: Color(0xffc2c8fe),
-      200: Color(0xff96a4fe),
-      300: Color(0xff6280ff),
-      400: Color(0xff2962ff),
-      500: Color(0xff0044fc),
-      600: Color(0xff003bf0),
-      700: Color(0xff002fe3),
-      800: Color(0xff0022d9),
-      900: Color(0xff0001c0),
-    })).copyWith(
-      secondary: const Color(0xff2962ff),
-    ),
-    primaryColor: const Color(0xff2962ff),
-    toggleableActiveColor: const Color(0xff2962ff),
-    unselectedWidgetColor: Colors.grey[600],
-    dividerColor: Colors.grey[400],
-    scaffoldBackgroundColor: Colors.grey[200],
-    textTheme: TextTheme(
-      bodyText2: TextStyle(color: Colors.grey[800]),
-      subtitle1: TextStyle(color: Colors.grey[800]),
-      caption: TextStyle(color: Colors.grey[600]),
-      overline: TextStyle(color: Colors.grey[400]),
-      button: const TextStyle(color: Colors.white),
-    ),
-    hintColor: Colors.grey[600],
+    brightness: brightness,
+    colorScheme: scheme,
+    useMaterial3: true,
+    toggleableActiveColor: scheme.primary,
+    dividerColor: is_light ? Colors.grey[400] : null,
+    scaffoldBackgroundColor: is_light ? Colors.grey[200] : null,
     iconTheme: const IconThemeData(color: Colors.grey),
     inputDecorationTheme: const InputDecorationTheme(isDense: true),
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: Colors.white,
-    ),
-    cupertinoOverrideTheme: const CupertinoThemeData(
-      brightness: Brightness.light,
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: Colors.grey,
+      selectionHandleColor: scheme.primaryContainer,
     ),
   );
 }
@@ -151,7 +136,6 @@ void time_picker_adaptive(BuildContext context, TimeOfDay initial, ValueChanged<
             onTimerDurationChanged: (Duration timer) {
               on_changed(TimeOfDay(hour: timer.inHours, minute: timer.inMinutes % 60));
             },
-            backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
           ),
           height: MediaQuery.of(context).copyWith().size.height / 3,
         );
@@ -168,8 +152,6 @@ Widget big_button_adaptive(BuildContext context, String label, IconData icon, Va
   if(Platform.isIOS) {
     return CupertinoButton(
       child: Text(label),
-      color: Theme.of(context).colorScheme.secondary,
-      disabledColor: Theme.of(context).disabledColor,
       minSize: 48,
       onPressed: on_tap,
     );

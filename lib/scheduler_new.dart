@@ -342,7 +342,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
             ),
             Text(
               '$_value %',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -369,7 +369,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
             ),
             Text(
               '$_value \u00B0',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -396,7 +396,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
             ),
             Text(
               '$_value %',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -423,7 +423,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
             ),
             Text(
               '${hue_to_temp(_value!)} K',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary)
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

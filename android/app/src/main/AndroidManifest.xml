@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"  tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"  tools:node="remove" />
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="Sunmachine"
         android:icon="@drawable/ic_launcher">
         <activity

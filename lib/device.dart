@@ -209,7 +209,6 @@ class _DeviceState extends State<Device> {
         child: Transform.scale(
           child: Switch.adaptive(
             value: _modes_switch.contains(_mode),
-            activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: _on_mode_switch,
           ),
           scale: Platform.isIOS ? 1.5 : 2.5,
@@ -312,7 +311,7 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text(
             '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -337,7 +336,7 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text(
             '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -354,7 +353,7 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[2]),
           Text(
             '${_hue[chan-2]} \u00B0',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -372,7 +371,7 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[3]),
           Text(
             '${_saturation[chan-2]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -394,7 +393,7 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text(
             '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -411,7 +410,7 @@ class _DeviceState extends State<Device> {
           Text(ROUTINE[4]),
           Text(
             '${hue_to_temp(_hue[chan-2])} K',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

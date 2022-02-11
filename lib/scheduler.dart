@@ -135,7 +135,7 @@ class _SchedulerState extends State<Scheduler> {
         ),
         Text(
           'No scheduled tasks found',
-          style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18)
+          style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 18)
         ),
         const Padding(
           child: Text(
@@ -175,7 +175,6 @@ class _SchedulerState extends State<Scheduler> {
       child: card_unified_nopad(child: ListTile(
         leading: Switch.adaptive(
           value: job['enabled'] != 0,
-          activeColor: Theme.of(context).colorScheme.secondary,
           onChanged: (bool state) => _on_state(job['_key'], state),
         ),
         title: RichText(

@@ -37,7 +37,8 @@ class App extends StatelessWidget {
         '/scheduler': (BuildContext context) => const Scheduler(),
         '/scheduler/new': (BuildContext context) => const SchedulerNew(),
       },
-      theme: app_theme(),
+      theme: app_theme(Brightness.light),
+      darkTheme: app_theme(Brightness.dark),
     );
   }
 }
@@ -228,15 +229,20 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Widget _build_intro() {
+    final bool is_light = Theme.of(context).brightness == Brightness.light;
+
     return Column(
       children: [
         Padding(
-          child: Image.asset('intro.png', fit: BoxFit.contain),
+          child: Image.asset(
+            is_light ? 'intro.png' : 'intro-opa.png',
+            fit: BoxFit.contain
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
         Text(
           'No light sources found',
-          style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 18),
         ),
         const Text(
           'Wait while looking for light sources.\nThis should take a few seconds.',
@@ -249,6 +255,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Widget _build_list() {
+    final bool is_light = Theme.of(context).brightness == Brightness.light;
     Size size = MediaQuery.of(context).size;
     double top = (size.height - size.width) / 3;
 
@@ -260,14 +267,11 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
         )),
         Column(children: [
           Container(
-            child: Align(
-              child: Text(
-                'Light sources',
-                style: TextStyle(color: Colors.grey[100]),
-              ),
+            child: const Align(
+              child: Text('Light sources'),
               alignment: Alignment.centerLeft,
             ),
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).cardColor,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           Expanded(child: ListView.separated(
@@ -291,7 +295,6 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
           contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onTap: () => _goto_device(index),
         ),
-        iconColor: Theme.of(context).iconTheme.color,
       ),
       margin: const EdgeInsets.all(0),
       shape: const RoundedRectangleBorder(),

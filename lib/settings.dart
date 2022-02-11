@@ -198,7 +198,7 @@ class _SettingsState extends State<Settings> {
           const Text('Turn off the light after'),
           Text(
             '${_timeout ~/ 12}:${(_timeout % 12 * 5).toString().padLeft(2, '0')} min',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,7 +219,7 @@ class _SettingsState extends State<Settings> {
           const Text('Turn on the light when it\'s darker than'),
           Text(
             '${_light * 5} lx',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,7 +239,7 @@ class _SettingsState extends State<Settings> {
           ),
           Text(
             '$_light_cur lx',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -254,7 +254,7 @@ class _SettingsState extends State<Settings> {
           const Text('Transition speed of the light'),
           Text(
             _speed.toString(),
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -285,7 +285,6 @@ class _SettingsState extends State<Settings> {
         contentPadding: const EdgeInsets.only(top: 4, left: 16, right: 16),
         onTap: _goto_scheduler,
       ),
-      iconColor: Theme.of(context).iconTheme.color,
     ));
   }
 
