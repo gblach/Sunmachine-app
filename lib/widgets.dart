@@ -89,6 +89,7 @@ Widget icon_adaptive(IconData material_icon, IconData cupertino_icon, {Color? co
 }
 
 Widget text_field_adaptive({
+  required BuildContext context,
   required TextEditingController controller,
   int? max_length,
   int max_lines=1,
@@ -99,6 +100,8 @@ Widget text_field_adaptive({
   required ValueChanged<String> on_submitted,
 }) {
   if(Platform.isIOS) {
+    final bool is_dark = Theme.of(context).brightness == Brightness.dark;
+
     return CupertinoTextField(
       controller: controller,
       maxLength: max_length,
@@ -107,6 +110,7 @@ Widget text_field_adaptive({
       autofocus: autofocus,
       obscureText: obscure_text,
       keyboardType: numpad ? TextInputType.number : null,
+      style: is_dark ? const TextStyle(color: Colors.white) : null,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       onSubmitted: on_submitted,
     );

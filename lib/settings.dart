@@ -182,6 +182,7 @@ class _SettingsState extends State<Settings> {
         ),
         const SizedBox(height: 6),
         text_field_adaptive(
+          context: context,
           controller: _name_ctrl,
           max_length: 40,
           on_submitted: _on_rename,
@@ -324,6 +325,7 @@ class _SettingsState extends State<Settings> {
             SizedBox(height: _channel[chan] ? 0 : (Platform.isIOS ? 6 : 7)),
             Row(children: [
               Expanded(child: text_field_adaptive(
+                context: context,
                 controller: _pixlen_ctrl[chan-2],
                 enabled: _channel[chan],
                 numpad: true,
