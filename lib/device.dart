@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
@@ -14,10 +12,10 @@ class Device extends StatefulWidget {
   const Device({Key? key}) : super(key: key);
 
   @override
-  _DeviceState createState() => _DeviceState();
+  DeviceState createState() => DeviceState();
 }
 
-class _DeviceState extends State<Device> {
+class DeviceState extends State<Device> {
   final List<Mode> _modes_switch = [Mode.on, Mode.auto];
   final List<Mode> _modes_radio = [Mode.off, Mode.on];
 
@@ -162,11 +160,11 @@ class _DeviceState extends State<Device> {
       appBar: AppBar(
         title: Text(ble_device.name),
         actions: [IconButton(
-          icon: icon_adaptive(Icons.settings, CupertinoIcons.settings),
+          icon: const Icon(Icons.settings),
           onPressed: _goto_settings,
         )],
       ),
-      body: _mutex ? loader('Loading settings ...') : _build_body(),
+      body: _mutex ? const Loader('Loading settings ...', null) : _build_body(),
     );
   }
 
@@ -189,8 +187,8 @@ class _DeviceState extends State<Device> {
       return SingleChildScrollView(child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: constraint.maxHeight),
         child: Column(
-          children: children,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: children,
         ),
       ));
     });
@@ -199,21 +197,21 @@ class _DeviceState extends State<Device> {
   Widget _build_switch() {
     return Column(children: [
       const Padding(
-        child: Align(
-          child: Text('Enable / Disable'),
-          alignment: Alignment.centerLeft,
-        ),
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text('Enable / Disable'),
+        ),
       ),
       Padding(
+        padding: const EdgeInsets.only(top: 16, bottom: 32),
         child: Transform.scale(
-          child: Switch.adaptive(
+          scale: 2.5,
+          child: Switch(
             value: _modes_switch.contains(_mode),
             onChanged: _on_mode_switch,
           ),
-          scale: Platform.isIOS ? 1.5 : 2.5,
         ),
-        padding: const EdgeInsets.only(top: 16, bottom: 32),
       ),
     ]);
   }
@@ -235,13 +233,15 @@ class _DeviceState extends State<Device> {
         break;
     }
 
-    return card_unified(
+    return CardUnified(
       child: Column(children: [
         const Align(
-          child: Text('Choose operating mode'),
           alignment: Alignment.centerLeft,
+          child: Text('Choose operating mode'),
         ),
         Container(
+          width: 160,
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(children: [
             RadioListTile(
               title: const Text('Auto'),
@@ -256,17 +256,13 @@ class _DeviceState extends State<Device> {
               onChanged: _on_mode_radio,
             ),
           ]),
-          width: 160,
-          padding: const EdgeInsets.symmetric(vertical: 16),
         ),
         const Divider(height: 0),
         Container(
-          child: Text(descr, textAlign: TextAlign.center, style: TextStyle(
-            color: Theme.of(context).textTheme.caption!.color,
-            height: 1.2,
-          )),
           height: 40,
           padding: const EdgeInsets.only(top: 6),
+          child: Text(descr, textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(height: 1.2)),
         ),
       ]),
     );
@@ -279,45 +275,38 @@ class _DeviceState extends State<Device> {
     for(int chan=0; chan<4; chan++) {
       if(board_channel(chan)) {
         buttons.add(ElevatedButton(
-          child: Text('Channel ${chan+1}'),
           style: ElevatedButton.styleFrom(
             primary: _channel == chan
-              ? Theme.of(context).toggleableActiveColor
-              : Theme.of(context).unselectedWidgetColor,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-          ),
+                ? Theme.of(context).toggleableActiveColor
+                : Theme.of(context).unselectedWidgetColor,
+            padding: const EdgeInsets.symmetric(horizontal: 12)),
           onPressed: () => _on_channel(chan),
+          child: Text('Channel ${chan+1}'),
         ));
       }
     }
 
     return Padding(
-      child: Wrap(
-        children: buttons,
-        alignment: WrapAlignment.center,
-        spacing: 8,
-      ),
       padding: EdgeInsets.symmetric(
         horizontal: width > 380 ? 8 : (width - 200) / 2,
         vertical: 8,
       ),
+      child: Wrap(alignment: WrapAlignment.center, spacing: 8, children: buttons),
     );
   }
 
   Widget _build_chan_mono(int chan) {
-    return card_unified(child: Column(children: [
+    return CardUnified(child: Column(children: [
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[1]),
-          Text(
-            '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
+          Text('${_brightness[chan]} %',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
         ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
       const SizedBox(height: 6),
-      Slider.adaptive(
+      Slider(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
         onChanged: (double value) => _on_brightness(chan, value.round()),
         onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
@@ -330,97 +319,83 @@ class _DeviceState extends State<Device> {
   }
 
   Widget _build_chan_rgb(int chan) {
-    return card_unified(child: Column(children: [
+    return CardUnified(child: Column(children: [
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[1]),
-          Text(
-            '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
+          Text('${_brightness[chan]} %',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
         ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
       const SizedBox(height: 6),
-      Slider.adaptive(
+      Slider(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
         onChanged: (double value) => _on_brightness(chan, value.round()),
         onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
       ),
       const Divider(height: 24),
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[2]),
-          Text(
-            '${_hue[chan-2]} \u00B0',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      ),
-      Slider.adaptive(
+          Text('${_hue[chan-2]} \u00B0',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        ]),
+      Slider(
         value: _hue[chan-2].toDouble(), min: 0, max: 360, divisions: 180,
         onChanged: (double value) => _on_hue(chan, value.round()),
         onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
       ),
-      gradient_hue(),
+      const XGradient.hue(),
       const SizedBox(height: 6),
       const Divider(height: 24),
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[3]),
-          Text(
-            '${_saturation[chan-2]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      ),
-      Slider.adaptive(
+          Text('${_saturation[chan-2]} %',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        ]),
+      Slider(
         value: _saturation[chan-2].toDouble(), min: 0, max: 100, divisions: 100,
         onChanged: (value) => _on_saturation(chan, value.round()),
         onChangeEnd: (value) => _on_saturation_end(chan, value.round()),
       ),
-      gradient_saturation(_hue[chan-2]),
+      XGradient.saturation(_hue[chan-2]),
       const SizedBox(height: 12),
     ]));
   }
 
   Widget _build_chan_wwa(int chan) {
-    return card_unified(child: Column(children: [
+    return CardUnified(child: Column(children: [
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[1]),
-          Text(
-            '${_brightness[chan]} %',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      ),
+          Text('${_brightness[chan]} %',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        ]),
       const SizedBox(height: 6),
-      Slider.adaptive(
+      Slider(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
         onChanged: (double value) => _on_brightness(chan, value.round()),
         onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
       ),
       const Divider(height: 24),
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[4]),
-          Text(
-            '${hue_to_temp(_hue[chan-2])} K',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      ),
-      Slider.adaptive(
+          Text('${XGradient.hue_to_temp(_hue[chan-2])} K',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        ]),
+      Slider(
         value: _hue[chan-2].toDouble(), min: 120, max: 360, divisions: 120,
         onChanged: (double value) => _on_hue(chan, value.round()),
         onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
       ),
-      gradient_temperature(),
+      const XGradient.temperature(),
       const SizedBox(height: 12),
     ]));
   }

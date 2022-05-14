@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
@@ -47,10 +46,10 @@ class Main extends StatefulWidget {
   const Main({Key? key}) : super(key: key);
 
   @override
-  _MainState createState() => _MainState();
+  MainState createState() => MainState();
 }
 
-class _MainState extends State<Main> with WidgetsBindingObserver {
+class MainState extends State<Main> with WidgetsBindingObserver {
   static const platform = MethodChannel('pl.blach.sunmachine/native');
   final List<DeviceTime> _devices = [];
   ConnStage? _conn_stage;
@@ -72,7 +71,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     ble = FlutterReactiveBle();
     ble.statusStream.listen((BleStatus status) {
       switch(status) {
@@ -89,22 +88,20 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _stop_scan();
     super.dispose();
   }
 
   void _bluetooth_enable() {
-    if(Platform.isAndroid) {
-      platform.invokeMethod('btenable');
-    }
+    if(Platform.isAndroid) platform.invokeMethod('btenable');
   }
 
   Future<void> _location_permission() async {
     if(Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      final AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
       if(23 <= androidInfo.version.sdkInt! && androidInfo.version.sdkInt! <= 30) {
-        Location location = Location();
+        final Location location = Location();
         while(await location.hasPermission() != PermissionStatus.granted) {
           await location.requestPermission();
         }
@@ -114,9 +111,9 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
 
   Future<void> _location_enable() async {
     if(Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      final AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
       if(23 <= androidInfo.version.sdkInt! && androidInfo.version.sdkInt! <= 30) {
-        Location location = Location();
+        final Location location = Location();
         if(! await location.serviceEnabled()) {
           await location.requestService();
         }
@@ -125,18 +122,15 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   void _start_scan() {
-    if(Platform.isAndroid) {
-      _cleanup_timer = Timer.periodic(const Duration(seconds: 1), _cleanup);
-    }
-
+    if(Platform.isAndroid) _cleanup_timer = Timer.periodic(const Duration(seconds: 1), _cleanup);
     _scan_sub = ble.scanForDevices(withServices: [service_uuid])
       .listen(_on_device_found, onError: print);
   }
 
   void _on_device_found(DiscoveredDevice device) {
     final DeviceTime device_time = DeviceTime(device, DateTime.now());
-    int index = _devices.indexWhere((DeviceTime _device_time) =>
-      _device_time.device.id == device_time.device.id);
+    int index = _devices.indexWhere((DeviceTime device_time_idx) =>
+      device_time.device.id == device_time_idx.device.id);
     setState(() {
       if(index < 0) _devices.add(device_time);
       else _devices[index] = device_time;
@@ -190,6 +184,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     final idv = await ble.readCharacteristic(Characteristic.idv);
     board_idv = String.fromCharCodes(idv).replaceAll('\u0000', '');
 
+    if(!mounted) return;
     Navigator.pushNamed(context, '/device').whenComplete(() async {
       await _conn_sub.cancel();
       setState(() => _conn_stage = null);
@@ -207,7 +202,7 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text('Sunmachine'),
         actions: [IconButton(
-          icon: icon_adaptive(Icons.refresh, CupertinoIcons.refresh),
+          icon: const Icon(Icons.refresh),
           onPressed: _conn_stage == null ? _restart_scan : null,
         )],
       ),
@@ -218,10 +213,10 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
   Widget _build_body() {
     switch(_conn_stage) {
       case ConnStage.connecting:
-        return loader('Connecting ...', 'Wait while connecting');
+        return const Loader('Connecting ...', 'Wait while connecting');
 
       case ConnStage.discovering:
-        return loader('Connecting ...', 'Wait while discovering services');
+        return const Loader('Connecting ...', 'Wait while discovering services');
 
       case null:
         return _devices.isEmpty ? _build_intro() : _build_list();
@@ -232,47 +227,44 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     final bool is_light = Theme.of(context).brightness == Brightness.light;
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Padding(
-          child: Image.asset(
-            is_light ? 'intro.png' : 'intro-opa.png',
-            fit: BoxFit.contain
-          ),
           padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Image.asset(is_light ? 'intro.png' : 'intro-dark.png', fit: BoxFit.contain),
         ),
-        Text(
-          'No light sources found',
-          style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 18),
-        ),
+        Text('No light sources found',
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: Theme.of(context).colorScheme.primary)),
         const Text(
           'Wait while looking for light sources.\nThis should take a few seconds.',
           textAlign: TextAlign.center,
           style: TextStyle(height: 1.5),
         ),
       ],
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
     );
   }
 
   Widget _build_list() {
-    final bool is_light = Theme.of(context).brightness == Brightness.light;
     Size size = MediaQuery.of(context).size;
     double top = (size.height - size.width) / 3;
 
     return RefreshIndicator(
+      onRefresh: _restart_scan,
       child: Stack(children: [
         Center(child: Padding(
-          child: Image.asset('intro-opa.png', fit: BoxFit.contain),
           padding: EdgeInsets.only(top: top, left: 20, right: 20),
+          child: Image.asset('intro-opa.png', fit: BoxFit.contain),
         )),
         Column(children: [
           Container(
-            child: const Align(
-              child: Text('Light sources'),
-              alignment: Alignment.centerLeft,
-            ),
-            color: Theme.of(context).cardColor,
+            color: Theme.of(context).colorScheme.background,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Light sources',
+                  style: TextStyle(color: Theme.of(context).colorScheme.onBackground)),
+            ),
           ),
           Expanded(child: ListView.separated(
             itemCount: _devices.length,
@@ -281,23 +273,22 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
           )),
         ]),
       ]),
-      onRefresh: _restart_scan,
     );
   }
 
   Widget _build_list_item(BuildContext context, int index) {
     return Card(
+      margin: const EdgeInsets.all(0),
+      shape: const RoundedRectangleBorder(),
       child: ListTileTheme(
          child: ListTile(
-          leading: icon_adaptive(Icons.lightbulb_outline, CupertinoIcons.lightbulb),
+          leading: const Icon(Icons.lightbulb_outline),
           title: Text(_devices[index].device.name),
-          trailing: icon_adaptive(Icons.chevron_right, CupertinoIcons.chevron_right),
+          trailing: const Icon(Icons.chevron_right),
           contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
           onTap: () => _goto_device(index),
         ),
       ),
-      margin: const EdgeInsets.all(0),
-      shape: const RoundedRectangleBorder(),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'bluetooth.dart';
 import 'widgets.dart';
@@ -11,10 +10,10 @@ class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
 
   @override
-  _SettingsState createState() => _SettingsState();
+  SettingsState createState() => SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class SettingsState extends State<Settings> {
   bool _mutex = true;
   final TextEditingController _name_ctrl = TextEditingController();
   late int _timeout;
@@ -34,7 +33,7 @@ class _SettingsState extends State<Settings> {
 
   void initAsync() async {
     final String name = Platform.isIOS ? ble_device.name
-      : String.fromCharCodes(await ble.readCharacteristic(Characteristic.device_name));
+        : String.fromCharCodes(await ble.readCharacteristic(Characteristic.device_name));
 
     setState(() {
       _mutex = false;
@@ -136,7 +135,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(ble_device.name)),
-      body: _mutex ? loader('Loading settings ...') : _build_body(),
+      body: _mutex ? const Loader('Loading settings ...', null) : _build_body()
     );
   }
 
@@ -168,43 +167,39 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _build_rename() {
-    return card_unified(
+    return CardUnified(
+      transparent: true,
       child: Column(children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Rename'),
-            Text(
-              'Need device restart',
-              style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
-            ),
+            Text('Need device restart',
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
           ],
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
         ),
         const SizedBox(height: 6),
-        text_field_adaptive(
+        XTextField(
           controller: _name_ctrl,
           max_length: 40,
           on_submitted: _on_rename,
         ),
       ]),
-      transparent: true,
     );
   }
 
   Widget _build_timeout() {
-    return card_unified(child: Column(children: [
+    return CardUnified(child: Column(children: [
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Turn off the light after'),
-          Text(
-            '${_timeout ~/ 12}:${(_timeout % 12 * 5).toString().padLeft(2, '0')} min',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
+          Text('${_timeout ~/ 12}:${(_timeout % 12 * 5).toString().padLeft(2, '0')} min',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
         ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
       const SizedBox(height: 6),
-      Slider.adaptive(
+      Slider(
         value: _timeout.toDouble(), min: 6, max: 120, divisions: 19,
         onChanged: (double value) => _on_timeout(value.round()),
         onChangeEnd:(double value) =>  _on_timeout_end(value.round()),
@@ -213,54 +208,46 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _build_light() {
-    return card_unified(child: Column(children: [
+    return CardUnified(child: Column(children: [
       Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Turn on the light when it\'s darker than'),
-          Text(
-            '${_light * 5} lx',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
+          Text('${_light * 5} lx',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
         ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
       const SizedBox(height: 6),
-      Slider.adaptive(
+      Slider(
         value: _light.toDouble(), min: 1, max: 20, divisions: 20,
         onChanged: (double value) => _on_ambient_light(value.round()),
         onChangeEnd: (double value) => _on_ambient_light_end(value.round()),
       ),
       const SizedBox(height: 6),
       Row(
-        children: [
-          Text(
-            'Current ambient light intensity',
-            style: TextStyle(color: Theme.of(context).textTheme.caption!.color),
-          ),
-          Text(
-            '$_light_cur lx',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-        ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Current ambient light intensity',
+              style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+          Text('$_light_cur lx',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        ],
       ),
     ]));
   }
 
   Widget _build_speed() {
-    return card_unified(child: Column(children: [
+    return CardUnified(child: Column(children: [
       Row(
-        children: [
-          const Text('Transition speed of the light'),
-          Text(
-            _speed.toString(),
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-        ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Transition speed'),
+          Text(_speed.toString(),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+        ],
       ),
       const SizedBox(height: 6),
-      Slider.adaptive(
+      Slider(
         value: _speed.toDouble(), min: 1, max: 20, divisions: 20,
         onChanged: (double value) => _on_speed(value.round()),
         onChangeEnd: (double value) => _on_speed_end(value.round()),
@@ -269,17 +256,18 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _build_scheduler() {
-    return card_unified_nopad(child: ListTileTheme(
+    return CardUnified.nopad(child: ListTileTheme(
       child: ListTile(
-        leading: Padding(
-          child: icon_adaptive(Icons.schedule, CupertinoIcons.clock),
-          padding: const EdgeInsets.only(top: 14, left: 8),
+        leading: const Padding(
+          padding: EdgeInsets.only(top: 14, left: 8),
+          child: Icon(Icons.schedule),
         ),
         title: const Text('Scheduler'),
-        subtitle: const Text('Schedule a change of mode, brightness, hue, saturation or temperature.'),
-        trailing: Padding(
-          child: icon_adaptive(Icons.chevron_right, CupertinoIcons.right_chevron),
-          padding: const EdgeInsets.only(top: 14),
+        subtitle:
+            const Text('Schedule a change of mode, brightness, hue, saturation or temperature.'),
+        trailing: const Padding(
+          padding: EdgeInsets.only(top: 14),
+          child: Icon(Icons.chevron_right),
         ),
         isThreeLine: true,
         contentPadding: const EdgeInsets.only(top: 4, left: 16, right: 16),
@@ -289,7 +277,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _build_chan_mono(int chan) {
-    return card_unified_nopad(child: CheckboxListTile(
+    return CardUnified.nopad(child: CheckboxListTile(
       title: Text('Channel ${chan+1}'),
       subtitle: Text('Enable or disable ${chan % 2 == 0 ? 'first' : 'second'} mono channel.'),
       value: _channel[chan],
@@ -300,7 +288,8 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _build_chan_color(int chan, [bool onoff=true]) {
-    return card_unified(
+    return CardUnified(
+      top: 0, bottom: 16, left: 0, right: 0,
       child: Column(children: [
         onoff ? CheckboxListTile(
           title: Text('Channel ${chan+1}'),
@@ -311,19 +300,19 @@ class _SettingsState extends State<Settings> {
           onChanged: (bool? value) => _on_channel(chan, value!),
         ) : const SizedBox(height: 12),
         Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(children: [
             Align(
-              child: Text(
-                'Number of pixels',
-                style: onoff
-                  ? Theme.of(context).textTheme.caption
-                  : Theme.of(context).textTheme.bodyText2,
-              ),
               alignment: Alignment.centerLeft,
+              child: Text('Number of pixels',
+                style: onoff
+                    ? Theme.of(context).textTheme.bodySmall
+                    : Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
-            SizedBox(height: _channel[chan] ? 0 : (Platform.isIOS ? 6 : 7)),
+            SizedBox(height: _channel[chan] ? 0 : 6),
             Row(children: [
-              Expanded(child: text_field_adaptive(
+              Expanded(child: XTextField(
                 controller: _pixlen_ctrl[chan-2],
                 enabled: _channel[chan],
                 numpad: true,
@@ -333,19 +322,16 @@ class _SettingsState extends State<Settings> {
               DropdownButton(
                 value: PIXTYPE[_pixtype[chan-2]],
                 items: PIXTYPE.map((String value) {
-                  return DropdownMenuItem(child: Text(value), value: value);
+                  return DropdownMenuItem(value: value, child: Text(value));
                 }).toList(),
                 underline: Container(),
-                onChanged: _channel[chan]
-                  ? (String? value) => _on_pixtype(chan, value!) : null,
+                onChanged: _channel[chan] ? (String? value) => _on_pixtype(chan, value!) : null,
               ),
             ]),
             SizedBox(height: _channel[chan] ? 0 : 6),
           ]),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
       ]),
-      top: 0, bottom: 16, left: 0, right: 0,
     );
   }
 }

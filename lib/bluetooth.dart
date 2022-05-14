@@ -61,22 +61,16 @@ bool board_channel(int chan, [bool? value]) {
 }
 
 int board_mode([int? value]) {
-  if(value != null) {
-    ble_control[0] = (ble_control[0] & 0xf0) + value;
-  }
+  if(value != null) ble_control[0] = (ble_control[0] & 0xf0) + value;
   return ble_control[0] & 0x0f;
 }
 
 int board_brightness(int chan, [int? value]) {
   if(chan < 2) {
-    if(value != null) {
-      return ble_control[chan+1] = value;
-    }
+    if(value != null) return ble_control[chan+1] = value;
     return ble_control[chan+1];
   } else {
-    if(value != null) {
-      return ble_strip[5 + (chan-2) * 6] = value;
-    }
+    if(value != null) return ble_strip[5 + (chan-2) * 6] = value;
     return ble_strip[5 + (chan-2) * 6];
   }
 }
@@ -95,33 +89,25 @@ int board_hue(int chan, [int? value]) {
 int board_saturation(int chan, [int? value]) {
   if(chan < 2) return -1;
   int offset = (chan - 2) * 6;
-  if(value != null) {
-    return ble_strip[4 + offset] = value;
-  }
+  if(value != null) return ble_strip[4 + offset] = value;
   return ble_strip[4 + offset];
 }
 
 int board_timeout([int? value]) {
   final int idx = ble_control.length - 3;
-  if(value != null) {
-    return ble_control[idx] = value;
-  }
+  if(value != null) return ble_control[idx] = value;
   return ble_control[idx];
 }
 
 int board_light([int? value]) {
   final int idx = ble_control.length - 2;
-  if(value != null) {
-    return ble_control[idx] = value;
-  }
+  if(value != null) return ble_control[idx] = value;
   return ble_control[idx];
 }
 
 int board_speed([int? value]) {
   final int idx = ble_control.length - 1;
-  if(value != null) {
-    return ble_control[idx] = value;
-  }
+  if(value != null) return ble_control[idx] = value;
   return ble_control[idx];
 }
 
@@ -138,9 +124,7 @@ int board_pixlen(int chan, [int? value]) {
 int board_pixtype(int chan, [int? value]) {
   if(chan < 2) return -1;
   int offset = (chan - 2) * 6;
-  if(value != null) {
-    ble_strip[4 + offset] = value == 0 ? 100 : 250;
-  }
+  if(value != null) ble_strip[4 + offset] = value == 0 ? 100 : 250;
   return ble_strip[4 + offset] <= 100 ? 0 : 1;
 }
 
@@ -169,7 +153,8 @@ void board_crontab_to_cronbuf() {
     Map<String,dynamic> job = board_crontab[i];
     ble_cronbuf[0 + offset] = job['enabled'] << 7 | job['dow'];
     ble_cronbuf[1 + offset] = job['hh'] << 3 | job['mm'] >> 3;
-    ble_cronbuf[2 + offset] = job['mm'] << 5 | job['routine'] << 3 | job['chan'] << 1 | job['value'] >> 8;
+    ble_cronbuf[2 + offset] =
+        job['mm'] << 5 | job['routine'] << 3 | job['chan'] << 1 | job['value'] >> 8;
     ble_cronbuf[3 + offset] = job['value'] & 0xff;
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'bluetooth.dart';
 import 'dow_picker.dart';
@@ -9,10 +8,10 @@ class SchedulerNew extends StatefulWidget {
   const SchedulerNew({Key? key}) : super(key: key);
 
   @override
-  _SchedulerNewState createState() => _SchedulerNewState();
+  SchedulerNewState createState() => SchedulerNewState();
 }
 
-class _SchedulerNewState extends State<SchedulerNew> {
+class SchedulerNewState extends State<SchedulerNew> {
   bool _is_valid = false;
   final List<bool> _dow_ctrl = DowPicker.init();
   TimeOfDay? _time;
@@ -21,36 +20,35 @@ class _SchedulerNewState extends State<SchedulerNew> {
   int? _value;
 
   void _on_dow() {
-    dow_picker_adaptive(context,
-      'Select days of the week', DowPicker(ctrl: _dow_ctrl), _validate);
+    showDialog(context: context, builder: (BuildContext context) =>
+        DowPicker('Select days of the week', _dow_ctrl, _validate));
   }
 
-  void _on_time() {
-    TimeOfDay? time = _time ?? TimeOfDay.now();
-    time_picker_adaptive(context, time, (TimeOfDay time) {
+  void _on_time() async {
+    TimeOfDay? time = await showTimePicker(context: context, initialTime: _time ?? TimeOfDay.now());
+    if(time != null) {
       _time = time;
       _validate();
-    });
+    }
   }
 
-  List<Map<String,dynamic>> _channels() {
-    List<Map<String,dynamic>> channels = [];
-    for(int chan=0; chan<4; chan++) {
+  List<Map<String, dynamic>> _channels() {
+    List<Map<String, dynamic>> channels = [];
+    for(int chan = 0; chan < 4; chan++) {
       switch(_routine) {
         case 1:
-          if(board_channel(chan))
-            channels.add({ 'label': 'Channel #${chan+1}', 'value': chan });
+          if(board_channel(chan)) channels.add({'label': 'Channel #${chan + 1}', 'value': chan});
           break;
 
         case 2:
         case 3:
           if(board_channel(chan) && board_pixtype(chan) == 0)
-            channels.add({ 'label': 'Channel #${chan+1}', 'value': chan });
+            channels.add({'label': 'Channel #${chan + 1}', 'value': chan});
           break;
 
         case 4:
           if(board_channel(chan) && board_pixtype(chan) == 1)
-            channels.add({ 'label': 'Channel #${chan+1}', 'value': chan });
+            channels.add({'label': 'Channel #${chan + 1}', 'value': chan});
           break;
       }
     }
@@ -75,16 +73,26 @@ class _SchedulerNewState extends State<SchedulerNew> {
 
   void _value_default() {
     switch(_routine) {
-      case 0: _value = null; break;
-      case 1: _value = _chan != null ? board_brightness(_chan!) : 10; break;
-      case 2: _value = _chan != null ? board_hue(_chan!) : 0; break;
-      case 3: _value = _chan != null ? board_saturation(_chan!) : 0; break;
-      case 4: _value = _chan != null ? board_hue(_chan!) : 120; break;
+      case 0:
+        _value = null;
+        break;
+      case 1:
+        _value = _chan != null ? board_brightness(_chan!) : 10;
+        break;
+      case 2:
+        _value = _chan != null ? board_hue(_chan!) : 0;
+        break;
+      case 3:
+        _value = _chan != null ? board_saturation(_chan!) : 0;
+        break;
+      case 4:
+        _value = _chan != null ? board_hue(_chan!) : 120;
+        break;
     }
   }
 
   void _on_routine() {
-    List<Map<String,dynamic>> routines = [
+    List<Map<String, dynamic>> routines = [
       { 'label': ROUTINE[0], 'value': 0 },
     ];
     switch(board_idv) {
@@ -112,40 +120,43 @@ class _SchedulerNewState extends State<SchedulerNew> {
         break;
     }
 
-    bottom_sheet_adaptive(context, routines, (dynamic value) {
-      _routine = value;
-      if(board_idv == 'SMA1') {
-        _channels();
-      } else {
-        _chan = 2;
-      }
-      _value_default();
-      _validate();
-    });
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) => XBottomSheet(routines, (dynamic value) {
+        _routine = value;
+        if(board_idv == 'SMA1') _channels();
+        else _chan = 2;
+        _value_default();
+        _validate();
+      }),
+    );
   }
 
   void _on_chan() {
-    List<Map<String,dynamic>> channels = _channels();
+    List<Map<String, dynamic>> channels = _channels();
 
     if(channels.length > 1) {
-      bottom_sheet_adaptive(context, channels, (dynamic value) {
-        _chan = value;
-        _value_default();
-        _validate();
-      });
+      showModalBottomSheet(context: context,
+        builder: (BuildContext context) => XBottomSheet(channels, (dynamic value) {
+          _chan = value;
+          _value_default();
+          _validate();
+        }),
+      );
     }
   }
 
   void _on_mode() {
-    final List<Map<String,dynamic>> modes = List.generate(MODE.length, (int index) {
+    final List<Map<String, dynamic>> modes = List.generate(MODE.length, (int index) {
       final int value = MODE.length - index - 1;
       return { 'label': MODE[value], 'value': value };
     });
 
-    bottom_sheet_adaptive(context, modes, (dynamic value) {
-      _value = value;
-      _validate();
-    });
+    showModalBottomSheet(context: context,
+      builder: (BuildContext context) => XBottomSheet(modes, (dynamic value) {
+        _value = value;
+        _validate();
+      }));
   }
 
   void _on_value(double value) {
@@ -193,7 +204,6 @@ class _SchedulerNewState extends State<SchedulerNew> {
     setState(() => _is_valid = valid == 0);
   }
 
-
   void _on_save() {
     if(_is_valid) {
       int dow = 0;
@@ -222,10 +232,9 @@ class _SchedulerNewState extends State<SchedulerNew> {
     return Scaffold(
       appBar: AppBar(
         title: Text(ble_device.name),
-        actions: [IconButton(
-          icon: icon_adaptive(Icons.check, CupertinoIcons.checkmark_alt),
-          onPressed: _is_valid ? _on_save : null,
-        )],
+        actions: [
+          IconButton(icon: const Icon(Icons.check), onPressed: _is_valid ? _on_save : null),
+        ],
       ),
       body: _build_body(),
     );
@@ -241,24 +250,21 @@ class _SchedulerNewState extends State<SchedulerNew> {
     if(board_idv == 'SMA1') children.add(_build_chan());
     children.add(_build_value());
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints viewportConstraints) {
-        return SingleChildScrollView(child: ConstrainedBox(
-          child: Column(
-            children: [
-              Column(children: children),
-              Padding(
-                child: big_button_adaptive(context,
-                  'Save', Icons.check, _is_valid ? _on_save : null),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-              ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          ),
-          constraints: BoxConstraints(minHeight: viewportConstraints.maxHeight),
-        ));
-      }
-    );
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
+      return SingleChildScrollView(child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: viewportConstraints.maxHeight),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(children: children),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: BigButton('Save', Icons.check, _is_valid ? _on_save : null),
+            ),
+          ],
+        ),
+      ));
+    });
   }
 
   Widget _build_dow() {
@@ -272,7 +278,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
       }
     }
 
-    return card_unified_nopad(child: ListTile(
+    return CardUnified.nopad(child: ListTile(
       title: Text(dow),
       subtitle: const Text('days of week'),
       onTap: _on_dow,
@@ -280,17 +286,17 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   Widget _build_time() {
-    return card_unified_nopad(child: ListTile(
-      title: Text(_time != null
-        ? '${_time!.hour}:${_time!.minute.toString().padLeft(2, '0')}'
-        : ''),
+    final String title = _time != null ?
+      '${_time!.hour}:${_time!.minute.toString().padLeft(2, '0')}' : '';
+    return CardUnified.nopad(child: ListTile(
+      title: Text(title),
       subtitle: const Text('time'),
       onTap: _on_time,
     ));
   }
 
   Widget _build_routine() {
-    return card_unified_nopad(child: ListTile(
+    return CardUnified.nopad(child: ListTile(
       title: Text(_routine != null ? ROUTINE[_routine!] : ''),
       subtitle: const Text('routine'),
       onTap: _on_routine,
@@ -300,7 +306,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   Widget _build_chan() {
     if(_routine == null || _routine == 0) return const SizedBox();
 
-    return card_unified_nopad(child: ListTile(
+    return CardUnified.nopad(child: ListTile(
       title: Text(_chan != null ? 'Channel #${_chan!+1}' : ''),
       subtitle: const Text('channel'),
       onTap: _on_chan,
@@ -319,7 +325,7 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   Widget _build_mode() {
-    return card_unified_nopad(child: ListTile(
+    return CardUnified.nopad(child: ListTile(
       title: Text(_value != null ? MODE[_value!.toInt()] : ''),
       subtitle: const Text('mode'),
       onTap: _on_mode,
@@ -327,109 +333,81 @@ class _SchedulerNewState extends State<SchedulerNew> {
   }
 
   Widget _build_brightness() {
-    return card_unified(
-      child: Column(children: [
-        Slider.adaptive(
-          value: _value!.toDouble(), min: 10, max: 100, divisions: 90,
-          onChanged: _on_value,
-          onChangeEnd: (double value) => _validate(),
-        ),
-        Row(
-          children: [
-            Text(
-              ROUTINE[1].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
-            ),
-            Text(
-              '$_value %',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        )
-      ]),
+    return CardUnified(
       top: 6,
+      child: Column(children: [
+        Slider(value: _value!.toDouble(), min: 10, max: 100, divisions: 90,
+            onChanged: _on_value, onChangeEnd: (double value) => _validate()),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[1].toLowerCase(),
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+            Text('$_value %', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          ],
+        ),
+      ]),
     );
   }
 
   Widget _build_hue() {
-    return card_unified(
+    return CardUnified(
+      top: 6,
       child: Column(children: [
-        Slider.adaptive(
-          value: _value!.toDouble(), min: 0, max: 360, divisions: 180,
-          onChanged: _on_value, onChangeEnd: (double value) => _validate(),
-        ),
-        gradient_hue(),
+        Slider(value: _value!.toDouble(), min: 0, max: 360, divisions: 180,
+            onChanged: _on_value, onChangeEnd: (double value) => _validate()),
+        const XGradient.hue(),
         const SizedBox(height: 12),
         Row(
-          children: [
-            Text(
-              ROUTINE[2].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
-            ),
-            Text(
-              '$_value \u00B0',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)
-            ),
-          ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        )
+          children: [
+            Text(ROUTINE[2].toLowerCase(),
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+            Text('$_value \u00B0', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          ],
+        ),
       ]),
-      top: 6,
     );
   }
 
   Widget _build_saturation() {
-    return card_unified(
+    return CardUnified(
+      top: 6,
       child: Column(children: [
-        Slider.adaptive(
-          value: _value!.toDouble(), min: 0, max: 100, divisions: 100,
-          onChanged: _on_value, onChangeEnd: (double value) => _validate(),
-        ),
-        gradient_saturation(_chan != null ? board_hue(_chan!) : 224),
+        Slider(value: _value!.toDouble(), min: 0, max: 100, divisions: 100,
+            onChanged: _on_value, onChangeEnd: (double value) => _validate()),
+        XGradient.saturation(_chan != null ? board_hue(_chan!) : 224),
         const SizedBox(height: 12),
         Row(
-          children: [
-            Text(
-              ROUTINE[3].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
-            ),
-            Text(
-              '$_value %',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)
-            ),
-          ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        )
+          children: [
+            Text(ROUTINE[3].toLowerCase(),
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+            Text('$_value %', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          ],
+        ),
       ]),
-      top: 6,
     );
   }
 
   Widget _build_temperature() {
-    return card_unified(
+    return CardUnified(
+      top: 6,
       child: Column(children: [
-        Slider.adaptive(
-          value: _value!.toDouble(), min: 120, max: 360, divisions: 120,
-          onChanged: _on_value, onChangeEnd: (double value) => _validate(),
-        ),
-        gradient_temperature(),
+        Slider(value: _value!.toDouble(), min: 120, max: 360, divisions: 120,
+          onChanged: _on_value, onChangeEnd: (double value) => _validate()),
+        const XGradient.temperature(),
         const SizedBox(height: 12),
         Row(
-          children: [
-            Text(
-              ROUTINE[4].toLowerCase(),
-              style: TextStyle(color: Theme.of(context).textTheme.caption!.color)
-            ),
-            Text(
-              '${hue_to_temp(_value!)} K',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)
-            ),
-          ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[4].toLowerCase(),
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+            Text('${XGradient.hue_to_temp(_value!)} K',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          ],
         ),
       ]),
-      top: 6,
     );
   }
 }

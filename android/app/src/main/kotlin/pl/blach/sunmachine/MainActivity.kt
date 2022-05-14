@@ -1,11 +1,11 @@
 package pl.blach.sunmachine
 
 import android.bluetooth.BluetoothAdapter
-import androidx.annotation.NonNull;
+import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugins.GeneratedPluginRegistrant
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "pl.blach.sunmachine/native"

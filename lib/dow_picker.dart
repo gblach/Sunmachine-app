@@ -1,90 +1,52 @@
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'widgets.dart';
 
 class DowPicker extends StatefulWidget {
+  final String title;
   final List<bool> ctrl;
+  final ValueGetter on_tap;
 
-  const DowPicker({
-    Key? key,
-    required this.ctrl,
-  }) : super(key: key);
+  const DowPicker(this.title, this.ctrl, this.on_tap, {Key? key}) : super(key: key);
 
   static init() => [true, true, true, true, true, true, true];
 
   @override
-  _DowPickerState createState() => _DowPickerState();
+  DowPickerState createState() => DowPickerState();
 }
 
-class _DowPickerState extends State<DowPicker> {
-  late List<bool> ctrl;
-
-  @override
-  void initState() {
-    ctrl = widget.ctrl;
-    super.initState();
-  }
-
-  Widget tile(int index, String title) {
+class DowPickerState extends State<DowPicker> {
+  Widget _tile(int index, String title) {
     return CheckboxListTile(
       title: Text(title),
       controlAffinity: ListTileControlAffinity.leading,
-      value: ctrl[index],
-      onChanged: (state) => setState(() => ctrl[index] = state!),
+      value: widget.ctrl[index],
+      onChanged: (state) => setState(() => widget.ctrl[index] = state!),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        tile(0, DOW_LONG[0]),
-        tile(1, DOW_LONG[1]),
-        tile(2, DOW_LONG[2]),
-        tile(3, DOW_LONG[3]),
-        tile(4, DOW_LONG[4]),
-        tile(5, DOW_LONG[5]),
-        tile(6, DOW_LONG[6]),
-      ],
-      mainAxisSize: MainAxisSize.min,
+    return AlertDialog(
+      title: Text(widget.title.toUpperCase(), style: Theme.of(context).textTheme.overline),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _tile(0, DOW_LONG[0]),
+          _tile(1, DOW_LONG[1]),
+          _tile(2, DOW_LONG[2]),
+          _tile(3, DOW_LONG[3]),
+          _tile(4, DOW_LONG[4]),
+          _tile(5, DOW_LONG[5]),
+          _tile(6, DOW_LONG[6]),
+        ],
+      ),
+      actions: [TextButton(
+        child: const Text('OK'),
+        onPressed: () {
+          Navigator.pop(context);
+          widget.on_tap();
+        },
+      )],
     );
   }
-}
-
-void dow_picker_adaptive(BuildContext context, String title, DowPicker dow_picker, ValueGetter on_tap) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      if(Platform.isIOS) {
-        return CupertinoAlertDialog(
-          title: Text(title),
-          content: Card(
-            child: dow_picker,
-            color: Colors.transparent,
-            elevation: 0,
-          ),
-          actions: [CupertinoDialogAction(
-            child: const Text('OK'),
-            onPressed: () {
-              Navigator.pop(context);
-              on_tap();
-            },
-          )],
-        );
-      } else {
-        return AlertDialog(
-          title: Text(title.toUpperCase(), style: Theme.of(context).textTheme.overline),
-          content: dow_picker,
-          actions: [TextButton(
-            child: const Text('OK'),
-            onPressed: () {
-              Navigator.pop(context);
-              on_tap();
-            },
-          )],
-        );
-      }
-    }
-  );
 }
