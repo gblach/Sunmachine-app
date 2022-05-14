@@ -1,47 +1,51 @@
 PODS:
-  - device_info (0.0.1):
+  - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_ble_lib (2.3.2):
-    - Flutter
-    - MultiplatformBleAdapter (~> 0.1.8)
   - flutter_native_timezone (0.0.1):
     - Flutter
   - location (0.0.1):
     - Flutter
-  - MultiplatformBleAdapter (0.1.8)
+  - Protobuf (3.19.4)
+  - reactive_ble_mobile (0.0.1):
+    - Flutter
+    - Protobuf (~> 3.5)
+    - SwiftProtobuf (~> 1.0)
+  - SwiftProtobuf (1.18.0)
 
 DEPENDENCIES:
-  - device_info (from `.symlinks/plugins/device_info/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
-  - flutter_ble_lib (from `.symlinks/plugins/flutter_ble_lib/ios`)
   - flutter_native_timezone (from `.symlinks/plugins/flutter_native_timezone/ios`)
   - location (from `.symlinks/plugins/location/ios`)
+  - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/ios`)
 
 SPEC REPOS:
   trunk:
-    - MultiplatformBleAdapter
+    - Protobuf
+    - SwiftProtobuf
 
 EXTERNAL SOURCES:
-  device_info:
-    :path: ".symlinks/plugins/device_info/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
-  flutter_ble_lib:
-    :path: ".symlinks/plugins/flutter_ble_lib/ios"
   flutter_native_timezone:
     :path: ".symlinks/plugins/flutter_native_timezone/ios"
   location:
     :path: ".symlinks/plugins/location/ios"
+  reactive_ble_mobile:
+    :path: ".symlinks/plugins/reactive_ble_mobile/ios"
 
 SPEC CHECKSUMS:
-  device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_ble_lib: 675f6ceaa6cd6a675bba408b705042458a782101
-  flutter_native_timezone: e72ff1900460ff57cfd331d1758050c9269f3e99
+  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  flutter_native_timezone: 5f05b2de06c9776b4cc70e1839f03de178394d22
   location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
-  MultiplatformBleAdapter: bdfdd698ea5d816f0f389eda13d5b07a1bc74b59
+  Protobuf: 235750e4696ff59fb07d949a9dbbc92b3c0700fe
+  reactive_ble_mobile: 9ce6723d37ccf701dbffd202d487f23f5de03b4c
+  SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: 7368163408c647b7eb699d0d788ba6718e18fb8d
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.2
