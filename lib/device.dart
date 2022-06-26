@@ -83,6 +83,7 @@ class DeviceState extends State<Device> {
           break;
 
         case 'SMA2':
+        case 'SMA3':
           _channel = 2;
           _brightness = [ 0, 0, board_brightness(2) ];
           _hue = [ board_hue(2) ];
@@ -341,7 +342,8 @@ class DeviceState extends State<Device> {
           Text(ROUTINE[2]),
           Text('${_hue[chan-2]} \u00B0',
               style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ]),
+        ],
+      ),
       Slider(
         value: _hue[chan-2].toDouble(), min: 0, max: 360, divisions: 180,
         onChanged: (double value) => _on_hue(chan, value.round()),
@@ -356,7 +358,8 @@ class DeviceState extends State<Device> {
           Text(ROUTINE[3]),
           Text('${_saturation[chan-2]} %',
               style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ]),
+        ],
+      ),
       Slider(
         value: _saturation[chan-2].toDouble(), min: 0, max: 100, divisions: 100,
         onChanged: (value) => _on_saturation(chan, value.round()),
@@ -375,7 +378,8 @@ class DeviceState extends State<Device> {
           Text(ROUTINE[1]),
           Text('${_brightness[chan]} %',
               style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ]),
+        ],
+      ),
       const SizedBox(height: 6),
       Slider(
         value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
@@ -389,7 +393,8 @@ class DeviceState extends State<Device> {
           Text(ROUTINE[4]),
           Text('${XGradient.hue_to_temp(_hue[chan-2])} K',
               style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ]),
+        ],
+      ),
       Slider(
         value: _hue[chan-2].toDouble(), min: 120, max: 360, divisions: 120,
         onChanged: (double value) => _on_hue(chan, value.round()),

@@ -61,6 +61,7 @@ class SettingsState extends State<Settings> {
           break;
 
         case 'SMA2':
+        case 'SMA3':
           _channel = [ false, false, true ];
           _pixlen_ctrl = [ TextEditingController(text: board_pixlen(2).toString()) ];
           _pixtype = [ board_pixtype(2) ];
@@ -159,6 +160,7 @@ class SettingsState extends State<Settings> {
         break;
 
       case 'SMA2':
+      case 'SMA3':
         children.add(_build_chan_color(2, false));
         break;
     }
@@ -208,18 +210,21 @@ class SettingsState extends State<Settings> {
   }
 
   Widget _build_light() {
+    final int max = board_idv == 'SMA3' ? 50 : 20;
+    final int mult = board_idv == 'SMA3' ? 1 : 5;
+
     return CardUnified(child: Column(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Turn on the light when it\'s darker than'),
-          Text('${_light * 5} lx',
+          Text('${_light * mult} lx',
               style: TextStyle(color: Theme.of(context).colorScheme.primary)),
         ],
       ),
       const SizedBox(height: 6),
       Slider(
-        value: _light.toDouble(), min: 1, max: 20, divisions: 20,
+        value: _light.toDouble(), min: 1, max: max.toDouble(), divisions: max,
         onChanged: (double value) => _on_ambient_light(value.round()),
         onChangeEnd: (double value) => _on_ambient_light_end(value.round()),
       ),

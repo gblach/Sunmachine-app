@@ -110,6 +110,7 @@ class SchedulerNewState extends State<SchedulerNew> {
         break;
 
       case 'SMA2':
+      case 'SMA3':
         routines.add({ 'label': ROUTINE[1], 'value': 1 });
         if(board_pixtype(2) == 0) {
           routines.add({ 'label': ROUTINE[2], 'value': 2 });
