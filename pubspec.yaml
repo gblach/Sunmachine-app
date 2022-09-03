@@ -1,14 +1,14 @@
 name: sunmachine
 description: Smart lighting system
-version: 0.7.2+3
+version: 0.7.3+4
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=2.18.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  device_info_plus: ^4.0.0
+  device_info_plus: ^4.1.2
   flutter_native_timezone: ^2.0.0
   flutter_reactive_ble: ^5.0.2
   location: ^4.4.0
@@ -16,7 +16,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.9.3
+  flutter_launcher_icons: ^0.10.0
   flutter_lints: ^2.0.1
 
 flutter:
