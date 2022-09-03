@@ -2,8 +2,8 @@
 Sunmachine is an application to control smart lighting system.
 The whole system includes the following elements:
 - this application
-- [printed circuit board](https://github.com/gblach/Sunmachine-A2-pcb)
-- [firmware for the board](https://github.com/gblach/Sunmachine-A2-fw)
+- [printed circuit board](https://github.com/gblach/Sunmachine-A3-pcb)
+- [firmware for the board](https://github.com/gblach/Sunmachine-A3-fw)
 - WS2812-like LED strip
 - 5V power supply
 
