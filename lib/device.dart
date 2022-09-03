@@ -277,12 +277,16 @@ class DeviceState extends State<Device> {
       if(board_channel(chan)) {
         buttons.add(ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: _channel == chan
-                ? Theme.of(context).toggleableActiveColor
-                : Theme.of(context).unselectedWidgetColor,
-            padding: const EdgeInsets.symmetric(horizontal: 12)),
+            backgroundColor: _channel == chan
+                ? Theme.of(context).secondaryHeaderColor
+                : Theme.of(context).cardColor,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+          ),
           onPressed: () => _on_channel(chan),
-          child: Text('Channel ${chan+1}'),
+          child: Text('Channel ${chan+1}', style: TextStyle(color: _channel == chan
+              ? Theme.of(context).toggleableActiveColor
+              : Theme.of(context).unselectedWidgetColor,
+          )),
         ));
       }
     }
