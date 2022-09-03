@@ -309,7 +309,7 @@
 	"Asia/Taipei": "CST-8",
 	"Asia/Tashkent": "AAA-5",
 	"Asia/Tbilisi": "AAA-4",
-	"Asia/Tehran": "AAA-3:30BBB,J79/24,J263/24",
+	"Asia/Tehran": "AAA-3:30",
 	"Asia/Thimbu": "AAA-6",
 	"Asia/Thimphu": "AAA-6",
 	"Asia/Tokyo": "JST-9",
@@ -439,6 +439,7 @@
 	"Europe/Kaliningrad": "EET-2",
 	"Europe/Kiev": "EET-2EEST,M3.5.0/3,M10.5.0/4",
 	"Europe/Kirov": "AAA-3",
+	"Europe/Kyiv": "EET-2EEST,M3.5.0/3,M10.5.0/4",
 	"Europe/Lisbon": "WET0WEST,M3.5.0/1,M10.5.0",
 	"Europe/Ljubljana": "CET-1CEST,M3.5.0,M10.5.0/3",
 	"Europe/London": "GMT0BST,M3.5.0/1,M10.5.0",
@@ -500,7 +501,7 @@
 	"Indian/Mauritius": "AAA-4",
 	"Indian/Mayotte": "EAT-3",
 	"Indian/Reunion": "AAA-4",
-	"Iran": "AAA-3:30BBB,J79/24,J263/24",
+	"Iran": "AAA-3:30",
 	"Jamaica": "EST5",
 	"Japan": "JST-9",
 	"Kwajalein": "AAA-12",
@@ -582,5 +583,5 @@
 	"W-SU": "MSK-3",
 	"WET": "WET0WEST,M3.5.0/1,M10.5.0",
 	"Zulu": "UTC0",
-	"_tzdb": "2022a"
+	"_tzdb": "2022c"
 }
