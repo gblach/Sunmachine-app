@@ -18,6 +18,7 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.10.0
   flutter_lints: ^2.0.1
+  flutter_native_splash: ^2.2.13
 
 flutter:
   uses-material-design: true
@@ -31,3 +32,9 @@ flutter_icons:
   android: false
   ios: true
   image_path: 'assets/appicon.png'
+
+flutter_native_splash:
+  color: '#fefbff'
+  color_dark: '#1b1b1f'
+  image: 'assets/intro.png'
+  image_dark: 'assets/intro-dark.png'
