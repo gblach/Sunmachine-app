@@ -29,9 +29,12 @@ flutter:
     - tzdata.json
 
 flutter_icons:
-  android: false
-  ios: true
   image_path: 'assets/appicon.png'
+  android: true
+  adaptive_icon_background: '#bed6fe'
+  adaptive_icon_foreground: 'assets/appicon-adpt.png'
+  ios: true
+  remove_alpha_ios: true
 
 flutter_native_splash:
   color: '#fefbff'
