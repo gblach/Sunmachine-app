@@ -145,13 +145,14 @@ class SchedulerState extends State<Scheduler> {
             style: TextStyle(height: 1.5),
           ),
         ),
-        BigButton('Create a new task', Icons.add, _goto_scheduler_new),
+        BigButton('Create a new task', Icons.add, stadium: true, on_tap: _goto_scheduler_new),
       ],
     );
   }
 
   Widget _build_list() {
-    double top = (MediaQuery.of(context).size.height - MediaQuery.of(context).size.width) / 3;
+    final Size size = MediaQuery.of(context).size;
+    final double top = (size.height - size.width) / 3;
 
     return Stack(children: [
       Center(child: Padding(
@@ -180,10 +181,9 @@ class SchedulerState extends State<Scheduler> {
         title: RichText(
           text: TextSpan(
             text: job['_title_1'],
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.bodyLarge,
             children: <TextSpan>[
-              const TextSpan(text: '  \u279E  ',
-                  style: TextStyle(color: Colors.grey)),
+              TextSpan(text: '  \u279E  ', style: TextMuted(context)),
               TextSpan(text: job['_title_2']),
             ],
           ),

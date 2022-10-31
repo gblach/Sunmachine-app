@@ -306,8 +306,7 @@ class DeviceState extends State<Device> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(ROUTINE[1]),
-          Text('${_brightness[chan]} %',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          Text('${_brightness[chan]} %', style: Theme.of(context).textTheme.labelLarge),
         ],
       ),
       const SizedBox(height: 6),
@@ -324,88 +323,90 @@ class DeviceState extends State<Device> {
   }
 
   Widget _build_chan_rgb(int chan) {
-    return CardUnified(child: Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(ROUTINE[1]),
-          Text('${_brightness[chan]} %',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ],
-      ),
-      const SizedBox(height: 6),
-      Slider(
-        value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
-        onChanged: (double value) => _on_brightness(chan, value.round()),
-        onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
-      ),
-      const Divider(height: 24),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(ROUTINE[2]),
-          Text('${_hue[chan-2]} \u00B0',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ],
-      ),
-      Slider(
-        value: _hue[chan-2].toDouble(), min: 0, max: 360, divisions: 180,
-        onChanged: (double value) => _on_hue(chan, value.round()),
-        onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
-      ),
-      const XGradient.hue(),
-      const SizedBox(height: 6),
-      const Divider(height: 24),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(ROUTINE[3]),
-          Text('${_saturation[chan-2]} %',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ],
-      ),
-      Slider(
-        value: _saturation[chan-2].toDouble(), min: 0, max: 100, divisions: 100,
-        onChanged: (value) => _on_saturation(chan, value.round()),
-        onChangeEnd: (value) => _on_saturation_end(chan, value.round()),
-      ),
-      XGradient.saturation(_hue[chan-2]),
-      const SizedBox(height: 12),
-    ]));
+    return CardUnified(
+      transparent: true,
+      child: Column(children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[1]),
+            Text('${_brightness[chan]} %', style: Theme.of(context).textTheme.labelLarge),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Slider(
+          value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
+          onChanged: (double value) => _on_brightness(chan, value.round()),
+          onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
+        ),
+        const Divider(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[2]),
+            Text('${_hue[chan-2]} \u00B0', style: Theme.of(context).textTheme.labelLarge),
+          ],
+        ),
+        Slider(
+          value: _hue[chan-2].toDouble(), min: 0, max: 360, divisions: 180,
+          onChanged: (double value) => _on_hue(chan, value.round()),
+          onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
+        ),
+        const XGradient.hue(),
+        const SizedBox(height: 6),
+        const Divider(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[3]),
+            Text('${_saturation[chan-2]} %', style: Theme.of(context).textTheme.labelLarge),
+          ],
+        ),
+        Slider(
+          value: _saturation[chan-2].toDouble(), min: 0, max: 100, divisions: 100,
+          onChanged: (value) => _on_saturation(chan, value.round()),
+          onChangeEnd: (value) => _on_saturation_end(chan, value.round()),
+        ),
+        XGradient.saturation(_hue[chan-2]),
+        const SizedBox(height: 12),
+      ]),
+    );
   }
 
   Widget _build_chan_wwa(int chan) {
-    return CardUnified(child: Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(ROUTINE[1]),
-          Text('${_brightness[chan]} %',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ],
-      ),
-      const SizedBox(height: 6),
-      Slider(
-        value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
-        onChanged: (double value) => _on_brightness(chan, value.round()),
-        onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
-      ),
-      const Divider(height: 24),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(ROUTINE[4]),
-          Text('${XGradient.hue_to_temp(_hue[chan-2])} K',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-        ],
-      ),
-      Slider(
-        value: _hue[chan-2].toDouble(), min: 120, max: 360, divisions: 120,
-        onChanged: (double value) => _on_hue(chan, value.round()),
-        onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
-      ),
-      const XGradient.temperature(),
-      const SizedBox(height: 12),
-    ]));
+    return CardUnified(
+      transparent: true,
+      child: Column(children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[1]),
+            Text('${_brightness[chan]} %', style: Theme.of(context).textTheme.labelLarge),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Slider(
+          value: _brightness[chan].toDouble(), min: 10, max: 100, divisions: 90,
+          onChanged: (double value) => _on_brightness(chan, value.round()),
+          onChangeEnd: (double value) => _on_brightness_end(chan, value.round()),
+        ),
+        const Divider(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(ROUTINE[4]),
+            Text('${XGradient.hue_to_temp(_hue[chan-2])} K',
+                style: Theme.of(context).textTheme.labelLarge),
+          ],
+        ),
+        Slider(
+          value: _hue[chan-2].toDouble(), min: 120, max: 360, divisions: 120,
+          onChanged: (double value) => _on_hue(chan, value.round()),
+          onChangeEnd: (double value) => _on_hue_end(chan, value.round()),
+        ),
+        const XGradient.temperature(),
+        const SizedBox(height: 12),
+      ]),
+    );
   }
 }

@@ -246,8 +246,8 @@ class MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   Widget _build_list() {
-    Size size = MediaQuery.of(context).size;
-    double top = (size.height - size.width) / 3;
+    final Size size = MediaQuery.of(context).size;
+    final double top = (size.height - size.width) / 3;
 
     return RefreshIndicator(
       onRefresh: _restart_scan,

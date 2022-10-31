@@ -37,7 +37,8 @@ class SchedulerNewState extends State<SchedulerNew> {
     for(int chan = 0; chan < 4; chan++) {
       switch(_routine) {
         case 1:
-          if(board_channel(chan)) channels.add({'label': 'Channel #${chan + 1}', 'value': chan});
+          if(board_channel(chan))
+            channels.add({'label': 'Channel #${chan + 1}', 'value': chan});
           break;
 
         case 2:
@@ -73,21 +74,11 @@ class SchedulerNewState extends State<SchedulerNew> {
 
   void _value_default() {
     switch(_routine) {
-      case 0:
-        _value = null;
-        break;
-      case 1:
-        _value = _chan != null ? board_brightness(_chan!) : 10;
-        break;
-      case 2:
-        _value = _chan != null ? board_hue(_chan!) : 0;
-        break;
-      case 3:
-        _value = _chan != null ? board_saturation(_chan!) : 0;
-        break;
-      case 4:
-        _value = _chan != null ? board_hue(_chan!) : 120;
-        break;
+      case 0: _value = null; break;
+      case 1: _value = _chan != null ? board_brightness(_chan!) : 10; break;
+      case 2: _value = _chan != null ? board_hue(_chan!) : 0; break;
+      case 3: _value = _chan != null ? board_saturation(_chan!) : 0; break;
+      case 4: _value = _chan != null ? board_hue(_chan!) : 120; break;
     }
   }
 
@@ -260,7 +251,7 @@ class SchedulerNewState extends State<SchedulerNew> {
             Column(children: children),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: BigButton('Save', Icons.check, _is_valid ? _on_save : null),
+              child: BigButton('Save', Icons.check, on_tap: _is_valid ? _on_save : null),
             ),
           ],
         ),
@@ -321,7 +312,7 @@ class SchedulerNewState extends State<SchedulerNew> {
       case 2: return _build_hue();
       case 3: return _build_saturation();
       case 4: return _build_temperature();
-      default: return const SizedBox();
+      default: return const SizedBox.shrink();
     }
   }
 
@@ -342,9 +333,8 @@ class SchedulerNewState extends State<SchedulerNew> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(ROUTINE[1].toLowerCase(),
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
-            Text('$_value %', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            Text(ROUTINE[1].toLowerCase(), style: TextMuted(context)),
+            Text('$_value %', style: Theme.of(context).textTheme.labelLarge),
           ],
         ),
       ]),
@@ -362,9 +352,8 @@ class SchedulerNewState extends State<SchedulerNew> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(ROUTINE[2].toLowerCase(),
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
-            Text('$_value \u00B0', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            Text(ROUTINE[2].toLowerCase(), style: TextMuted(context)),
+            Text('$_value \u00B0', style: Theme.of(context).textTheme.labelLarge),
           ],
         ),
       ]),
@@ -382,9 +371,8 @@ class SchedulerNewState extends State<SchedulerNew> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(ROUTINE[3].toLowerCase(),
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
-            Text('$_value %', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            Text(ROUTINE[3].toLowerCase(), style: TextMuted(context)),
+            Text('$_value %', style: Theme.of(context).textTheme.labelLarge),
           ],
         ),
       ]),
@@ -402,10 +390,9 @@ class SchedulerNewState extends State<SchedulerNew> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(ROUTINE[4].toLowerCase(),
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+            Text(ROUTINE[4].toLowerCase(), style: TextMuted(context)),
             Text('${XGradient.hue_to_temp(_value!)} K',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                style: Theme.of(context).textTheme.labelLarge),
           ],
         ),
       ]),

@@ -176,8 +176,7 @@ class SettingsState extends State<Settings> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Rename'),
-            Text('Need device restart',
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
+            Text('Need device restart', style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
         const SizedBox(height: 6),
@@ -197,7 +196,7 @@ class SettingsState extends State<Settings> {
         children: [
           const Text('Turn off the light after'),
           Text('${_timeout ~/ 12}:${(_timeout % 12 * 5).toString().padLeft(2, '0')} min',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+              style: Theme.of(context).textTheme.labelLarge),
         ],
       ),
       const SizedBox(height: 6),
@@ -218,8 +217,7 @@ class SettingsState extends State<Settings> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Turn on the light when it\'s darker than'),
-          Text('${_light * mult} lx',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          Text('${_light * mult} lx', style: Theme.of(context).textTheme.labelLarge),
         ],
       ),
       const SizedBox(height: 6),
@@ -232,10 +230,8 @@ class SettingsState extends State<Settings> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Current ambient light intensity',
-              style: TextStyle(color: Theme.of(context).textTheme.bodySmall!.color)),
-          Text('$_light_cur lx',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          Text('Current ambient light intensity', style: TextMuted(context)),
+          Text('$_light_cur lx', style: Theme.of(context).textTheme.labelLarge),
         ],
       ),
     ]));
@@ -247,8 +243,7 @@ class SettingsState extends State<Settings> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Transition speed'),
-          Text(_speed.toString(),
-              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          Text(_speed.toString(), style: Theme.of(context).textTheme.labelLarge),
         ],
       ),
       const SizedBox(height: 6),

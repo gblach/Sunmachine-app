@@ -12,13 +12,17 @@ enum GradientType { hue, saturation, temperature }
 ThemeData app_theme(Brightness brightness) {
   final scheme = ColorScheme.fromSeed(
     brightness: brightness,
-    seedColor: const Color(0xff2962ff),
+    seedColor: const Color(0xff3b82f6),
   );
 
   return ThemeData(
     brightness: brightness,
     colorScheme: scheme,
     useMaterial3: true,
+    cardTheme: CardTheme(
+      color: scheme.secondaryContainer,
+      elevation: 0,
+    ),
     toggleableActiveColor: scheme.primary,
     scaffoldBackgroundColor: scheme.background,
   );
@@ -64,24 +68,14 @@ class CardUnified extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Padding inner_card = Padding(
-      padding: EdgeInsets.only(top: top, bottom: bottom, left: left, right: right),
-      child: child,
+    return Card(
+      color: transparent ? Colors.transparent : null,
+      margin: const EdgeInsets.all(8),
+      child: Padding(
+        padding: EdgeInsets.only(top: top, bottom: bottom, left: left, right: right),
+        child: child,
+      ),
     );
-
-    if(! transparent) {
-      return Card(
-        margin: const EdgeInsets.all(8),
-        child: inner_card,
-      );
-    } else {
-      return Card(
-        color: Colors.transparent,
-        elevation: 0,
-        margin: const EdgeInsets.all(8),
-        child: inner_card,
-      );
-    }
   }
 }
 
@@ -117,9 +111,14 @@ class XTextField extends StatelessWidget {
 class BigButton extends StatelessWidget {
   final String label;
   final IconData icon;
+  final bool stadium;
   final ValueGetter? on_tap;
 
-  const BigButton(this.label, this.icon, this.on_tap, {Key? key}) : super(key: key);
+  const BigButton(this.label, this.icon, {
+    this.stadium = false,
+    this.on_tap,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -129,10 +128,13 @@ class BigButton extends StatelessWidget {
         label: Text(label),
         icon: Icon(icon),
         style: ElevatedButton.styleFrom(
-          primary: Theme.of(context).colorScheme.surfaceTint,
-          onPrimary: Theme.of(context).colorScheme.onInverseSurface,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
           textStyle: Theme.of(context).textTheme.titleMedium,
           minimumSize: const Size(double.infinity, 48),
+          shape: stadium
+              ? const StadiumBorder()
+              : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         onPressed: on_tap,
       ),
@@ -223,4 +225,8 @@ class XGradient extends StatelessWidget {
         ]);
     }
   }
+}
+
+TextStyle TextMuted(BuildContext context) {
+  return TextStyle(color: Theme.of(context).textTheme.bodySmall!.color);
 }
