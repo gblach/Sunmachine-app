@@ -11,7 +11,7 @@ os.system("make -C %s install DESTDIR=../tzdb-root" % dirname)
 tzdata = { '_tzdb': dirname[5:] }
 
 for file in glob.glob('tzdb-root/usr/share/zoneinfo/**', recursive=True):
-    if os.path.isfile(file):    
+    if os.path.isfile(file):
         with open(file, 'rb') as f:
             zone = f.readlines()
             if zone[0][:5] == b'TZif2':
