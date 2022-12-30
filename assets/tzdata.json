@@ -94,6 +94,7 @@
 	"America/Cayman": "EST5",
 	"America/Chicago": "CST6CDT,M3.2.0,M11.1.0",
 	"America/Chihuahua": "CST6",
+	"America/Ciudad_Juarez": "MST7MDT,M3.2.0,M11.1.0",
 	"America/Coral_Harbour": "EST5",
 	"America/Cordoba": "AAA3",
 	"America/Costa_Rica": "CST6",
@@ -114,6 +115,7 @@
 	"America/Fort_Wayne": "EST5EDT,M3.2.0,M11.1.0",
 	"America/Fortaleza": "AAA3",
 	"America/Glace_Bay": "AST4ADT,M3.2.0,M11.1.0",
+	"America/Godthab": "AAA2",
 	"America/Goose_Bay": "AST4ADT,M3.2.0,M11.1.0",
 	"America/Grand_Turk": "EST5EDT,M3.2.0,M11.1.0",
 	"America/Grenada": "AST4",
@@ -173,7 +175,8 @@
 	"America/North_Dakota/Beulah": "CST6CDT,M3.2.0,M11.1.0",
 	"America/North_Dakota/Center": "CST6CDT,M3.2.0,M11.1.0",
 	"America/North_Dakota/New_Salem": "CST6CDT,M3.2.0,M11.1.0",
-	"America/Ojinaga": "CST6",
+	"America/Nuuk": "AAA2",
+	"America/Ojinaga": "CST6CDT,M3.2.0,M11.1.0",
 	"America/Panama": "EST5",
 	"America/Pangnirtung": "EST5EDT,M3.2.0,M11.1.0",
 	"America/Paramaribo": "AAA3",
@@ -584,5 +587,5 @@
 	"W-SU": "MSK-3",
 	"WET": "WET0WEST,M3.5.0/1,M10.5.0",
 	"Zulu": "UTC0",
-	"_tzdb": "2022f"
+	"_tzdb": "2022g"
 }
