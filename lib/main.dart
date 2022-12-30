@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:app_settings/app_settings.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'bluetooth.dart';
 import 'device.dart';
 import 'settings.dart';
@@ -50,7 +50,6 @@ class Main extends StatefulWidget {
 }
 
 class MainState extends State<Main> with WidgetsBindingObserver {
-  static const platform = MethodChannel('pl.blach.sunmachine/native');
   final List<DeviceTime> _devices = [];
   ConnStage? _conn_stage;
   StreamSubscription<DiscoveredDevice>? _scan_sub;
@@ -75,8 +74,8 @@ class MainState extends State<Main> with WidgetsBindingObserver {
     ble = FlutterReactiveBle();
     ble.statusStream.listen((BleStatus status) {
       switch(status) {
+        case BleStatus.unauthorized: _ask_for_permissions(); break;
         case BleStatus.poweredOff: _bluetooth_enable(); break;
-        case BleStatus.unauthorized: _location_permission(); break;
         case BleStatus.locationServicesDisabled: _location_enable(); break;
         case BleStatus.ready: _start_scan(); break;
         case BleStatus.unsupported:
@@ -93,38 +92,40 @@ class MainState extends State<Main> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void _bluetooth_enable() {
-    if(Platform.isAndroid) platform.invokeMethod('btenable');
-  }
-
-  Future<void> _location_permission() async {
+  Future<void> _ask_for_permissions() async {
     if(Platform.isAndroid) {
       final AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
       if(23 <= androidInfo.version.sdkInt && androidInfo.version.sdkInt <= 30) {
-        final Location location = Location();
-        while(await location.hasPermission() != PermissionStatus.granted) {
-          await location.requestPermission();
+        if(await Permission.locationWhenInUse.isDenied) {
+          await Permission.locationWhenInUse.request();
+        }
+      } else if(31 <= androidInfo.version.sdkInt) {
+        if(await Permission.bluetoothScan.isDenied || await Permission.bluetoothConnect.isDenied) {
+          await [ Permission.bluetoothScan, Permission.bluetoothConnect ].request();
         }
       }
     }
+  }
+
+  void _bluetooth_enable() async {
+    await AppSettings.openBluetoothSettings();
   }
 
   Future<void> _location_enable() async {
-    if(Platform.isAndroid) {
-      final AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
-      if(23 <= androidInfo.version.sdkInt && androidInfo.version.sdkInt <= 30) {
-        final Location location = Location();
-        if(! await location.serviceEnabled()) {
-          await location.requestService();
-        }
-      }
-    }
+    await AppSettings.openLocationSettings();
   }
 
-  void _start_scan() {
-    if(Platform.isAndroid) _cleanup_timer = Timer.periodic(const Duration(seconds: 1), _cleanup);
-    _scan_sub = ble.scanForDevices(withServices: [service_uuid])
-      .listen(_on_device_found, onError: print);
+  void _start_scan() async {
+    bool require_location_services = true;
+    if(Platform.isAndroid) {
+      final AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      require_location_services =
+          23 <= androidInfo.version.sdkInt && androidInfo.version.sdkInt <= 30;
+      _cleanup_timer = Timer.periodic(const Duration(seconds: 1), _cleanup);
+    }
+    _scan_sub = ble.scanForDevices(withServices: [service_uuid],
+        requireLocationServicesEnabled: require_location_services)
+        .listen(_on_device_found, onError: print);
   }
 
   void _on_device_found(DiscoveredDevice device) {

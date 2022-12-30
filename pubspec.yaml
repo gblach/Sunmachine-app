@@ -8,17 +8,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  app_settings: 4.1.8
   device_info_plus: ^8.0.0
   flutter_native_timezone: ^2.0.0
-  flutter_reactive_ble: ^5.0.2
-  location: ^4.4.0
+  flutter_reactive_ble: ^5.0.3
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.10.0
+  flutter_launcher_icons: ^0.11.0
   flutter_lints: ^2.0.1
-  flutter_native_splash: ^2.2.13
+  flutter_native_splash: ^2.2.16
 
 flutter:
   uses-material-design: true
@@ -37,7 +38,10 @@ flutter_icons:
   remove_alpha_ios: true
 
 flutter_native_splash:
-  color: '#fefbff'
-  color_dark: '#1b1b1f'
-  image: 'assets/intro.png'
-  image_dark: 'assets/intro-dark.png'
+  color: '#bed6fe'
+  color_dark: '#393b3f'
+  image: 'assets/appicon-spl.png'
+  android_12:
+    color: '#bed6fe'
+    color_dark: '#393b3f'
+    image: 'assets/appicon-spl.png'
