@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'bluetooth.dart';
@@ -71,6 +72,12 @@ class MainState extends State<Main> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     ble = FlutterReactiveBle();
     ble.statusStream.listen((BleStatus status) {
       switch(status) {
@@ -82,6 +89,7 @@ class MainState extends State<Main> with WidgetsBindingObserver {
         case BleStatus.unknown:
       }
     });
+
     super.initState();
   }
 
