@@ -207,7 +207,7 @@ class DeviceState extends State<Device> {
       Padding(
         padding: const EdgeInsets.only(top: 16, bottom: 32),
         child: Transform.scale(
-          scale: 2.5,
+          scale: 2.0,
           child: Switch(
             value: _modes_switch.contains(_mode),
             onChanged: _on_mode_switch,

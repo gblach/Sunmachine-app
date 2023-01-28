@@ -130,7 +130,7 @@ class SchedulerState extends State<Scheduler> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Image.asset('intro.png', fit: BoxFit.contain),
+          child: Image.asset('assets/intro.png', fit: BoxFit.contain),
         ),
         Text('No scheduled tasks found',
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
@@ -156,7 +156,7 @@ class SchedulerState extends State<Scheduler> {
     return Stack(children: [
       Center(child: Padding(
         padding: EdgeInsets.only(top: top, left: 20, right: 20),
-        child: Image.asset('intro-opa.png', fit: BoxFit.contain),
+        child: Image.asset('assets/intro-opa.png', fit: BoxFit.contain),
       )),
       ListView.builder(
         itemCount: board_crontab.length,

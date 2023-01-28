@@ -23,7 +23,9 @@ ThemeData app_theme(Brightness brightness) {
       color: scheme.secondaryContainer,
       elevation: 0,
     ),
-    toggleableActiveColor: scheme.primary,
+    sliderTheme: SliderThemeData(
+      inactiveTrackColor: scheme.inversePrimary,
+    ),
     scaffoldBackgroundColor: scheme.background,
   );
 }

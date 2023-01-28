@@ -240,7 +240,7 @@ class MainState extends State<Main> with WidgetsBindingObserver {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Image.asset(is_light ? 'intro.png' : 'intro-dark.png', fit: BoxFit.contain),
+          child: Image.asset(is_light ? 'assets/intro.png' : 'assets/intro-dark.png', fit: BoxFit.contain),
         ),
         Text('No light sources found',
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
@@ -263,7 +263,7 @@ class MainState extends State<Main> with WidgetsBindingObserver {
       child: Stack(children: [
         Center(child: Padding(
           padding: EdgeInsets.only(top: top, left: 20, right: 20),
-          child: Image.asset('intro-opa.png', fit: BoxFit.contain),
+          child: Image.asset('assets/intro-opa.png', fit: BoxFit.contain),
         )),
         Column(children: [
           Container(

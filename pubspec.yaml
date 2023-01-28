@@ -3,12 +3,12 @@ description: Smart lighting system
 version: 0.7.3+4
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  app_settings: 4.1.8
+  app_settings: 4.2.0
   device_info_plus: ^8.0.0
   flutter_native_timezone: ^2.0.0
   flutter_reactive_ble: ^5.0.3
@@ -24,10 +24,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - intro.png
-    - intro-dark.png
-    - intro-opa.png
-    - tzdata.json
+    - assets/intro.png
+    - assets/intro-dark.png
+    - assets/intro-opa.png
+    - assets/tzdata.json
 
 flutter_icons:
   image_path: 'assets/appicon.png'
