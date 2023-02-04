@@ -119,7 +119,7 @@ class MainState extends State<Main> with WidgetsBindingObserver {
     ServicePopup(context, "bluetooth", AppSettings.openBluetoothSettings);
   }
 
-  Future<void> _location_enable() async {
+  void _location_enable() {
     ServicePopup(context, "location", AppSettings.openLocationSettings);
   }
 
