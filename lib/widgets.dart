@@ -229,6 +229,31 @@ class XGradient extends StatelessWidget {
   }
 }
 
+void ServicePopup(BuildContext context, String service, Function() callback) {
+  final content = 'You need to enable $service services to search for nearby devices.';
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: Text('Enable $service'),
+      content: Text(content),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            callback();
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    ),
+  );
+}
+
 TextStyle TextMuted(BuildContext context) {
   return TextStyle(color: Theme.of(context).textTheme.bodySmall!.color);
 }
