@@ -1,6 +1,6 @@
 name: sunmachine
 description: Smart lighting system
-version: 0.7.3+4
+version: 0.7.4+5
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
