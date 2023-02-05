@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -91,6 +92,45 @@ class DeviceState extends State<Device> {
           break;
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
+      if(! _mutex) {
+        timer.cancel();
+        if(board_pixlen(2) == 0 || (board_idv == 'SMA1' && board_pixlen(3) == 0)) {
+          _show_pixlen_popup();
+        }
+      }
+    });
+    super.didChangeDependencies();
+  }
+
+  void _show_pixlen_popup() {
+    const content = 'On first run, '
+      'you need to set the number of pixels and type of LED strip.';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('First run'),
+        content: const Text(content),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _goto_settings();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _on_mode_switch(bool value) {
