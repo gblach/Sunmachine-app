@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+//import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'bluetooth.dart';
 import 'widgets.dart';
 
@@ -39,20 +40,20 @@ class DeviceState extends State<Device> {
 
     final unix_time = ByteData(8);
     unix_time.setInt64(0, DateTime.now().millisecondsSinceEpoch ~/ 1000, Endian.little);
-    characteristic_write(Characteristic.unix_time, unix_time.buffer.asUint8List());
+    characteristic_write(SmCharacteristic.unix_time, unix_time.buffer.asUint8List());
 
-    final String timezone = await FlutterNativeTimezone.getLocalTimezone();
+    final String timezone = await FlutterTimezone.getLocalTimezone();
     final Map tzdata = jsonDecode(await rootBundle.loadString('assets/tzdata.json'));
     if(tzdata.containsKey(timezone)) {
-      characteristic_write(Characteristic.timezone, tzdata[timezone].codeUnits);
+      characteristic_write(SmCharacteristic.timezone, tzdata[timezone].codeUnits);
     }
   }
 
   Future<void> _refresh() async {
     setState(() => _mutex = true);
 
-    ble_control = await ble.readCharacteristic(Characteristic.control);
-    ble_strip = await ble.readCharacteristic(Characteristic.strip);
+    ble_control = await ble.readCharacteristic(SmCharacteristic.control);
+    ble_strip = await ble.readCharacteristic(SmCharacteristic.strip);
 
     setState(() {
       _mutex = false;
@@ -150,13 +151,13 @@ class DeviceState extends State<Device> {
       }
     });
     board_mode(_mode.index);
-    characteristic_write(Characteristic.control);
+    characteristic_write(SmCharacteristic.control);
   }
 
   Future<void> _on_mode_radio(Mode? value) async {
     setState(() => _mode = _mode_radio = value!);
     board_mode(_mode.index);
-    characteristic_write(Characteristic.control);
+    characteristic_write(SmCharacteristic.control);
   }
 
   void _on_channel(int chan) {
@@ -169,8 +170,8 @@ class DeviceState extends State<Device> {
 
   void _on_brightness_end(int chan, int value) {
     board_brightness(chan, value);
-    if(chan < 2) characteristic_write(Characteristic.control);
-    else characteristic_write(Characteristic.strip);
+    if(chan < 2) characteristic_write(SmCharacteristic.control);
+    else characteristic_write(SmCharacteristic.strip);
   }
 
   void _on_hue(int chan, int value) {
@@ -179,7 +180,7 @@ class DeviceState extends State<Device> {
 
   void _on_hue_end(int chan, int value) {
     board_hue(chan, value);
-    characteristic_write(Characteristic.strip);
+    characteristic_write(SmCharacteristic.strip);
   }
 
   void _on_saturation(int chan, int value) {
@@ -188,7 +189,7 @@ class DeviceState extends State<Device> {
 
   void _on_saturation_end(int chan, int value) {
     board_saturation(chan, value);
-    characteristic_write(Characteristic.strip);
+    characteristic_write(SmCharacteristic.strip);
   }
 
   void _goto_settings() {
@@ -318,14 +319,15 @@ class DeviceState extends State<Device> {
         buttons.add(ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: _channel == chan
-                ? Theme.of(context).secondaryHeaderColor
-                : Theme.of(context).cardColor,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.primaryContainer,
+            elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 12),
           ),
           onPressed: () => _on_channel(chan),
           child: Text('Channel ${chan+1}', style: TextStyle(color: _channel == chan
-              ? Theme.of(context).toggleableActiveColor
-              : Theme.of(context).unselectedWidgetColor,
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.onPrimaryContainer,
           )),
         ));
       }

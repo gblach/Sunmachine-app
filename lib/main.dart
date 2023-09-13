@@ -65,6 +65,7 @@ class MainState extends State<Main> with WidgetsBindingObserver {
         case AppLifecycleState.resumed: _start_scan(); break;
         case AppLifecycleState.inactive:
         case AppLifecycleState.detached:
+        case AppLifecycleState.hidden:
       }
     }
   }
@@ -116,11 +117,13 @@ class MainState extends State<Main> with WidgetsBindingObserver {
   }
 
   void _bluetooth_enable() {
-    ServicePopup(context, "bluetooth", AppSettings.openBluetoothSettings);
+    ServicePopup(context, "bluetooth", () =>
+        AppSettings.openAppSettings(type: AppSettingsType.bluetooth));
   }
 
   void _location_enable() {
-    ServicePopup(context, "location", AppSettings.openLocationSettings);
+    ServicePopup(context, "location", () =>
+        AppSettings.openAppSettings(type: AppSettingsType.location));
   }
 
   void _start_scan() async {
@@ -189,8 +192,9 @@ class MainState extends State<Main> with WidgetsBindingObserver {
   Future<void> _on_connected() async {
     setState(() => _conn_stage = ConnStage.discovering);
     await ble.requestMtu(deviceId: ble_device.id, mtu: 251);
-    map_characteristics(await ble.discoverServices(ble_device.id));
-    final idv = await ble.readCharacteristic(Characteristic.idv);
+    await ble.discoverAllServices(ble_device.id);
+    map_characteristics(await ble.getDiscoveredServices(ble_device.id));
+    final idv = await ble.readCharacteristic(SmCharacteristic.idv);
     board_idv = String.fromCharCodes(idv).replaceAll('\u0000', '');
 
     if(!mounted) return;

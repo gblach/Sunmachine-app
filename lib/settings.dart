@@ -33,7 +33,7 @@ class SettingsState extends State<Settings> {
 
   void initAsync() async {
     final String name = Platform.isIOS ? ble_device.name
-        : String.fromCharCodes(await ble.readCharacteristic(Characteristic.device_name));
+        : String.fromCharCodes(await ble.readCharacteristic(SmCharacteristic.device_name));
 
     setState(() {
       _mutex = false;
@@ -69,7 +69,7 @@ class SettingsState extends State<Settings> {
       }
     });
 
-    _light_sub = ble.subscribeToCharacteristic(Characteristic.light_cur).listen((List<int> value) {
+    _light_sub = ble.subscribeToCharacteristic(SmCharacteristic.light_cur).listen((List<int> value) {
       if(value.isNotEmpty) setState(() => _light_cur = (value[0] | value[1] << 8));
     }, onError: print);
   }
@@ -81,7 +81,7 @@ class SettingsState extends State<Settings> {
   }
 
   void _on_rename(String value) {
-    if(value.isNotEmpty) characteristic_write(Characteristic.device_name, value.codeUnits);
+    if(value.isNotEmpty) characteristic_write(SmCharacteristic.device_name, value.codeUnits);
   }
 
   void _on_timeout(int value) {
@@ -90,7 +90,7 @@ class SettingsState extends State<Settings> {
 
   void _on_timeout_end(int value) {
     board_timeout(value);
-    characteristic_write(Characteristic.control);
+    characteristic_write(SmCharacteristic.control);
   }
 
   void _on_ambient_light(int value) {
@@ -99,7 +99,7 @@ class SettingsState extends State<Settings> {
 
   void _on_ambient_light_end(int value) {
     board_light(value);
-    characteristic_write(Characteristic.control);
+    characteristic_write(SmCharacteristic.control);
   }
 
   void _on_speed(int value) {
@@ -108,24 +108,24 @@ class SettingsState extends State<Settings> {
 
   void _on_speed_end(int value) {
     board_speed(value.toInt());
-    characteristic_write(Characteristic.control);
+    characteristic_write(SmCharacteristic.control);
   }
 
   void _on_channel(int chan, bool value) {
     setState(() => _channel[chan] = value);
     board_channel(chan, value);
-    characteristic_write(Characteristic.control);
+    characteristic_write(SmCharacteristic.control);
   }
 
   void _on_pixlen(int chan, String value) {
     board_pixlen(chan, int.parse(value));
-    characteristic_write(Characteristic.strip);
+    characteristic_write(SmCharacteristic.strip);
   }
 
   void _on_pixtype(int chan, String value) {
     setState(() => _pixtype[chan-2] = board_pixtype(chan, PIXTYPE.indexOf(value)));
     if(_pixtype[chan-2] == 1 && board_hue(chan) < 120) board_hue(chan, 120);
-    characteristic_write(Characteristic.strip);
+    characteristic_write(SmCharacteristic.strip);
   }
 
   void _goto_scheduler() {

@@ -20,13 +20,12 @@ ThemeData app_theme(Brightness brightness) {
     colorScheme: scheme,
     useMaterial3: true,
     cardTheme: CardTheme(
-      color: scheme.secondaryContainer,
+      color: scheme.primaryContainer,
       elevation: 0,
     ),
     sliderTheme: SliderThemeData(
       inactiveTrackColor: scheme.inversePrimary,
     ),
-    scaffoldBackgroundColor: scheme.background,
   );
 }
 

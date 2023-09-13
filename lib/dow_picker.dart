@@ -27,7 +27,7 @@ class DowPickerState extends State<DowPicker> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.title.toUpperCase(), style: Theme.of(context).textTheme.overline),
+      title: Text(widget.title.toUpperCase(), style: Theme.of(context).textTheme.labelSmall),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

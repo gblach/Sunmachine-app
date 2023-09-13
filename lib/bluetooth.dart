@@ -2,8 +2,8 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
 Uuid service_uuid = Uuid.parse('20163400-f704-4e77-9acc-07b7ade2d0fe');
 
-class Characteristic {
-  Characteristic._();
+class SmCharacteristic {
+  SmCharacteristic._();
   static late QualifiedCharacteristic device_name;
   static late QualifiedCharacteristic idv;
   static late QualifiedCharacteristic control;
@@ -23,20 +23,20 @@ late List<int> ble_cronbuf;
 late List<Map<String,dynamic>> board_crontab;
 const int board_crontab_size = 10;
 
-void map_characteristics(List<DiscoveredService> services) {
-  for(final DiscoveredService s in services) {
-    for(final Uuid c in s.characteristicIds) {
+void map_characteristics(List<Service> services) {
+  for(final Service s in services) {
+    for(final Characteristic c in s.characteristics) {
       QualifiedCharacteristic qc = QualifiedCharacteristic(
-        deviceId: ble_device.id, serviceId: s.serviceId, characteristicId: c);
-      switch(c.toString()) {
-        case '00002a00-0000-1000-8000-00805f9b34fb': Characteristic.device_name = qc; break;
-        case '20163401-f704-4e77-9acc-07b7ade2d0fe': Characteristic.idv = qc; break;
-        case '20163402-f704-4e77-9acc-07b7ade2d0fe': Characteristic.control = qc; break;
-        case '20163403-f704-4e77-9acc-07b7ade2d0fe': Characteristic.strip = qc; break;
-        case '20163404-f704-4e77-9acc-07b7ade2d0fe': Characteristic.light_cur = qc; break;
-        case '20163405-f704-4e77-9acc-07b7ade2d0fe': Characteristic.cronbuf = qc; break;
-        case '20163406-f704-4e77-9acc-07b7ade2d0fe': Characteristic.unix_time = qc; break;
-        case '20163407-f704-4e77-9acc-07b7ade2d0fe': Characteristic.timezone = qc; break;
+        deviceId: ble_device.id, serviceId: s.id, characteristicId: c.id);
+      switch(c.id.toString()) {
+        case '00002a00-0000-1000-8000-00805f9b34fb': SmCharacteristic.device_name = qc; break;
+        case '20163401-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.idv = qc; break;
+        case '20163402-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.control = qc; break;
+        case '20163403-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.strip = qc; break;
+        case '20163404-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.light_cur = qc; break;
+        case '20163405-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.cronbuf = qc; break;
+        case '20163406-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.unix_time = qc; break;
+        case '20163407-f704-4e77-9acc-07b7ade2d0fe': SmCharacteristic.timezone = qc; break;
       }
     }
   }
@@ -45,9 +45,9 @@ void map_characteristics(List<DiscoveredService> services) {
 void characteristic_write(QualifiedCharacteristic qc, [List<int>? value0]) {
   late List<int> value;
   if(value0 != null) value = value0;
-  else if(qc == Characteristic.control) value = ble_control;
-  else if(qc == Characteristic.strip) value = ble_strip;
-  else if(qc == Characteristic.cronbuf) value = ble_cronbuf;
+  else if(qc == SmCharacteristic.control) value = ble_control;
+  else if(qc == SmCharacteristic.strip) value = ble_strip;
+  else if(qc == SmCharacteristic.cronbuf) value = ble_cronbuf;
   ble.writeCharacteristicWithResponse(qc, value: value);
 }
 
