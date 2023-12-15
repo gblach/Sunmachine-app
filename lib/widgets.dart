@@ -112,14 +112,9 @@ class XTextField extends StatelessWidget {
 class BigButton extends StatelessWidget {
   final String label;
   final IconData icon;
-  final bool stadium;
   final ValueGetter? on_tap;
 
-  const BigButton(this.label, this.icon, {
-    this.stadium = false,
-    this.on_tap,
-    Key? key,
-  }) : super(key: key);
+  const BigButton(this.label, this.icon, this.on_tap, { Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -133,9 +128,7 @@ class BigButton extends StatelessWidget {
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
           textStyle: Theme.of(context).textTheme.titleMedium,
           minimumSize: const Size(double.infinity, 48),
-          shape: stadium
-              ? const StadiumBorder()
-              : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         onPressed: on_tap,
       ),

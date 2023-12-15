@@ -125,12 +125,15 @@ class SchedulerState extends State<Scheduler> {
   }
 
   Widget _build_new() {
+    final bool is_light = Theme.of(context).brightness == Brightness.light;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Image.asset('assets/intro.png', fit: BoxFit.contain),
+          child: Image.asset(is_light ? 'assets/intro.png' : 'assets/intro-dark.png',
+              fit: BoxFit.contain),
         ),
         Text('No scheduled tasks found',
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
@@ -144,7 +147,7 @@ class SchedulerState extends State<Scheduler> {
             style: TextStyle(height: 1.5),
           ),
         ),
-        BigButton('Create a new task', Icons.add, stadium: true, on_tap: _goto_scheduler_new),
+        BigButton('Create a new task', Icons.add, _goto_scheduler_new),
       ],
     );
   }

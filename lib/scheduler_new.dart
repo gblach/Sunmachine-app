@@ -251,7 +251,7 @@ class SchedulerNewState extends State<SchedulerNew> {
             Column(children: children),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: BigButton('Save', Icons.check, on_tap: _is_valid ? _on_save : null),
+              child: BigButton('Save', Icons.check, _is_valid ? _on_save : null),
             ),
           ],
         ),
