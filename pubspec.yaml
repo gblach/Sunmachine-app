@@ -3,22 +3,22 @@ description: Smart lighting system
 version: 0.7.5+6
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  app_settings: ^5.0.0
-  device_info_plus: ^9.0.3
+  app_settings: ^5.1.1
+  device_info_plus: ^9.1.0
   flutter_reactive_ble: ^5.2.0
-  flutter_timezone: ^1.0.7
-  permission_handler: ^11.0.0
+  flutter_timezone: ^1.0.8
+  permission_handler: ^11.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-  flutter_lints: ^2.0.3
+  flutter_lints: ^3.0.1
   flutter_native_splash: ^2.3.2
 
 flutter:
