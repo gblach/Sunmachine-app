@@ -178,7 +178,7 @@ class MainState extends State<Main> with WidgetsBindingObserver {
     setState(() => _conn_stage = ConnStage.connecting);
     _conn_sub = ble.connectToDevice(
       id: ble_device.id,
-      connectionTimeout: const Duration(seconds: 2),
+      connectionTimeout: const Duration(seconds: 5),
     ).listen((ConnectionStateUpdate state) async {
       switch(state.connectionState) {
         case DeviceConnectionState.connected: _on_connected(); break;
