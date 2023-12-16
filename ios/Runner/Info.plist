@@ -40,7 +40,15 @@
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
 		<key>NSBluetoothAlwaysUsageDescription</key>
-		<string>You have to enable bluetooth to connect to device.</string>
+		<string>This app always needs Bluetooth to function</string>
+		<key>NSBluetoothPeripheralUsageDescription</key>
+		<string>This app needs Bluetooth Peripheral to function</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>This app always needs location and when in use to function</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>This app always needs location to function</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>This app needs location when in use to function</string>
 		<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>

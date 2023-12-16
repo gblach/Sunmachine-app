@@ -6,7 +6,7 @@ class DowPicker extends StatefulWidget {
   final List<bool> ctrl;
   final ValueGetter on_tap;
 
-  const DowPicker(this.title, this.ctrl, this.on_tap, {Key? key}) : super(key: key);
+  const DowPicker(this.title, this.ctrl, this.on_tap, {super.key});
 
   static init() => [true, true, true, true, true, true, true];
 

@@ -7,7 +7,7 @@ import 'widgets.dart';
 const List<String> PIXTYPE = [ 'RGB', 'WWA' ];
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({super.key});
 
   @override
   SettingsState createState() => SettingsState();
@@ -32,8 +32,9 @@ class SettingsState extends State<Settings> {
   }
 
   void initAsync() async {
-    final String name = Platform.isIOS ? ble_device.name
-        : String.fromCharCodes(await ble.readCharacteristic(SmCharacteristic.device_name));
+    final String name = Platform.isIOS
+        ? board_device.platformName
+        : String.fromCharCodes(await chr_device_name.read());
 
     setState(() {
       _mutex = false;
@@ -69,9 +70,12 @@ class SettingsState extends State<Settings> {
       }
     });
 
-    _light_sub = ble.subscribeToCharacteristic(SmCharacteristic.light_cur).listen((List<int> value) {
+    _light_sub = chr_light_cur.onValueReceived.listen((List<int> value) {
       if(value.isNotEmpty) setState(() => _light_cur = (value[0] | value[1] << 8));
     }, onError: print);
+
+    board_device.cancelWhenDisconnected(_light_sub!);
+    await chr_light_cur.setNotifyValue(true);
   }
 
   @override
@@ -81,7 +85,7 @@ class SettingsState extends State<Settings> {
   }
 
   void _on_rename(String value) {
-    if(value.isNotEmpty) characteristic_write(SmCharacteristic.device_name, value.codeUnits);
+    if(value.isNotEmpty) chr_device_name.write(value.codeUnits);
   }
 
   void _on_timeout(int value) {
@@ -90,7 +94,7 @@ class SettingsState extends State<Settings> {
 
   void _on_timeout_end(int value) {
     board_timeout(value);
-    characteristic_write(SmCharacteristic.control);
+    chr_control.write(board_control);
   }
 
   void _on_ambient_light(int value) {
@@ -99,7 +103,7 @@ class SettingsState extends State<Settings> {
 
   void _on_ambient_light_end(int value) {
     board_light(value);
-    characteristic_write(SmCharacteristic.control);
+    chr_control.write(board_control);
   }
 
   void _on_speed(int value) {
@@ -108,24 +112,24 @@ class SettingsState extends State<Settings> {
 
   void _on_speed_end(int value) {
     board_speed(value.toInt());
-    characteristic_write(SmCharacteristic.control);
+    chr_control.write(board_control);
   }
 
   void _on_channel(int chan, bool value) {
     setState(() => _channel[chan] = value);
     board_channel(chan, value);
-    characteristic_write(SmCharacteristic.control);
+    chr_control.write(board_control);
   }
 
   void _on_pixlen(int chan, String value) {
     board_pixlen(chan, int.parse(value));
-    characteristic_write(SmCharacteristic.strip);
+    chr_strip.write(board_strip);
   }
 
   void _on_pixtype(int chan, String value) {
     setState(() => _pixtype[chan-2] = board_pixtype(chan, PIXTYPE.indexOf(value)));
     if(_pixtype[chan-2] == 1 && board_hue(chan) < 120) board_hue(chan, 120);
-    characteristic_write(SmCharacteristic.strip);
+    chr_strip.write(board_strip);
   }
 
   void _goto_scheduler() {
@@ -135,7 +139,7 @@ class SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(ble_device.name)),
+      appBar: AppBar(title: Text(board_device.platformName)),
       body: _mutex ? const Loader('Loading settings ...', null) : _build_body()
     );
   }

@@ -5,7 +5,7 @@ import 'dow_picker.dart';
 import 'widgets.dart';
 
 class SchedulerNew extends StatefulWidget {
-  const SchedulerNew({Key? key}) : super(key: key);
+  const SchedulerNew({super.key});
 
   @override
   SchedulerNewState createState() => SchedulerNewState();
@@ -213,7 +213,7 @@ class SchedulerNewState extends State<SchedulerNew> {
         'value': _value,
       });
       board_crontab_to_cronbuf();
-      characteristic_write(SmCharacteristic.cronbuf);
+      chr_cronbuf.write(board_cronbuf);
     }
 
     Navigator.pop(context);
@@ -223,7 +223,7 @@ class SchedulerNewState extends State<SchedulerNew> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ble_device.name),
+        title: Text(board_device.name),
         actions: [
           IconButton(icon: const Icon(Icons.check), onPressed: _is_valid ? _on_save : null),
         ],

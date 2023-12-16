@@ -4,7 +4,7 @@ import 'bluetooth.dart';
 import 'widgets.dart';
 
 class Scheduler extends StatefulWidget {
-  const Scheduler({Key? key}) : super(key: key);
+  const Scheduler({super.key});
 
   @override
   SchedulerState createState() => SchedulerState();
@@ -20,7 +20,7 @@ class SchedulerState extends State<Scheduler> {
   }
 
   void initAsync() async {
-    ble_cronbuf = await ble.readCharacteristic(SmCharacteristic.cronbuf);
+    board_cronbuf = await chr_cronbuf.read();
     board_cronbuf_to_crontab();
     _refresh();
   }
@@ -90,14 +90,14 @@ class SchedulerState extends State<Scheduler> {
     final int index = board_crontab.indexWhere((dynamic job) => job['_key'] == key);
     setState(() => board_crontab[index]['enabled'] = state ? 1 : 0);
     board_crontab_to_cronbuf();
-    characteristic_write(SmCharacteristic.cronbuf);
+    chr_cronbuf.write(board_cronbuf);
   }
 
   void _on_delete(String key) async {
     final int index = board_crontab.indexWhere((dynamic job) => job['_key'] == key);
     setState(() => board_crontab.removeAt(index));
     board_crontab_to_cronbuf();
-    characteristic_write(SmCharacteristic.cronbuf);
+    chr_cronbuf.write(board_cronbuf);
   }
 
   void _goto_scheduler_new() {
@@ -108,7 +108,7 @@ class SchedulerState extends State<Scheduler> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ble_device.name),
+        title: Text(board_device.name),
         actions: [IconButton(
           icon: const Icon(Icons.add),
           onPressed: _mutex || board_crontab.length >= board_crontab_size

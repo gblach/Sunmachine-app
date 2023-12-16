@@ -33,7 +33,7 @@ class Loader extends StatelessWidget {
   final String title;
   final String? subtitle;
 
-  const Loader(this.title, this.subtitle, {Key? key}) : super(key: key);
+  const Loader(this.title, this.subtitle, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class CardUnified extends StatelessWidget {
 
   const CardUnified({required this.child,
     this.top=12, this.bottom=12, this.left=16, this.right=16,
-    this.transparent=false, Key? key}) : super(key: key);
+    this.transparent=false, super.key});
 
   const CardUnified.nopad({required this.child, this.transparent=false, Key? key})
       : top=0, bottom=0, left=0, right=0, super(key: key);
@@ -92,7 +92,7 @@ class XTextField extends StatelessWidget {
 
   const XTextField({required this.controller, this.max_length, this.max_lines=1,
     this.enabled=true, this.autofocus=false, this.obscure_text=false,
-    this.numpad=false, required this.on_submitted, Key? key}) : super(key: key);
+    this.numpad=false, required this.on_submitted, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,7 @@ class BigButton extends StatelessWidget {
   final IconData icon;
   final ValueGetter? on_tap;
 
-  const BigButton(this.label, this.icon, this.on_tap, { Key? key }) : super(key: key);
+  const BigButton(this.label, this.icon, this.on_tap, { super.key });
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +140,7 @@ class XBottomSheet extends StatelessWidget {
   final List<Map> values;
   final ValueSetter on_tap;
 
-  const XBottomSheet(this.values, this.on_tap, {Key? key}) : super(key: key);
+  const XBottomSheet(this.values, this.on_tap, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -165,9 +165,9 @@ class XGradient extends StatelessWidget {
   final GradientType type;
   final int hue;
 
-  const XGradient.hue({Key? key}) : type=GradientType.hue, hue=0, super(key: key);
-  const XGradient.saturation(this.hue, {Key? key}) : type=GradientType.saturation, super(key: key);
-  const XGradient.temperature({Key? key}) : type=GradientType.temperature, hue=0, super(key: key);
+  const XGradient.hue({super.key}) : type=GradientType.hue, hue=0;
+  const XGradient.saturation(this.hue, {super.key}) : type=GradientType.saturation;
+  const XGradient.temperature({super.key}) : type=GradientType.temperature, hue=0;
 
   static int hue_to_temp(int hue) {
     double temp = (hue - 240).toDouble();
