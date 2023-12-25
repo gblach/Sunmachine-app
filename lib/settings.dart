@@ -36,6 +36,9 @@ class SettingsState extends State<Settings> {
         ? board_device.platformName
         : String.fromCharCodes(await chr_device_name.read());
 
+    final light_cur = await chr_light_cur.read();
+    _light_cur = light_cur[0] | light_cur[1] << 8;
+
     setState(() {
       _mutex = false;
       _name_ctrl.text = name;
