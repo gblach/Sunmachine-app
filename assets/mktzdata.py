@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, glob, re, json, shutil
+import os, glob, json, shutil
 
 os.system('wget https://data.iana.org/time-zones/tzdb-latest.tar.lz')
 os.system('bsdtar xvf tzdb-latest.tar.lz')
@@ -17,10 +17,7 @@ for file in glob.glob('tzdb-root/usr/share/zoneinfo/**', recursive=True):
             if zone[0][:5] == b'TZif2':
                 tzdata[file[29:]] = zone[-1].decode().strip()
 
-regexp = re.compile(r'\<[\+\-]?[0-9]+\>')
 for name, zone in tzdata.items():
-    zone = regexp.sub('AAA', zone, 1)
-    zone = regexp.sub('BBB', zone, 1)
     tzdata[name] = zone
 
 with open('tzdata.json', 'w') as f:
