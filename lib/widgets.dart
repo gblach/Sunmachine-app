@@ -64,8 +64,8 @@ class CardUnified extends StatelessWidget {
     this.top=12, this.bottom=12, this.left=16, this.right=16,
     this.transparent=false, super.key});
 
-  const CardUnified.nopad({required this.child, this.transparent=false, Key? key})
-      : top=0, bottom=0, left=0, right=0, super(key: key);
+  const CardUnified.nopad({required this.child, this.transparent=false, super.key})
+      : top=0, bottom=0, left=0, right=0;
 
   @override
   Widget build(BuildContext context) {
